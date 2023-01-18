@@ -29,22 +29,22 @@ This final project's distinctiveness and complexity, in comparasion to the previ
 - Create a page with a habit tracker table for the current month. In this page the user must be able to:
     - add a new habit
     - remove a habit
+    - be able to undo the habit removal after a few seconds
     - shade habit completion for a specific day
     - choose different types of "shading" (yes/no, list of options, numbers, etc.)
     - add a lock for editing the habits (useful after the month is over)
-
 - Create a page that shows useful statistics, such as:
     - habits streak
     - highest habit streak
     - lowest habit streak
-    
 - The tracker table must have the same amount of days for the specific month
-- The user must be able to filter habit tracking from previous months
+- The user must be able to filter out habit tracking from previous months, and statistics for previous months
+- Docker must be used in order to standardize the way to develop and deploy the application
 - Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end
 - Your web application must be mobile-responsive
 
 ### Optional/Future features:
-- habit chains
+- setup a minimum streak for goal achievement
 
 ## How to Run
 TODO
