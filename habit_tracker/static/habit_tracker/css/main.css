@@ -1,0 +1,36 @@
+:root{
+    /* Os "--" se referem a criação de variáveis em CSS, que podem ser usadas com var(nome_variavel)*/
+
+    --color-background: #F0F0F7;
+    --color-background-dark: #904de1;
+    --color-primary-lighter: #9871F5;
+    --color-primary-light: #916BEA;
+    --color-primary:#8257E5;
+    --color-primary-dark: #774DD6;
+    --color-primary-darker: #6842C2;
+    --color-title-in-primary: #FFFFFF;
+    --color-text-in-primary: #D4C2FF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    color: var(--color-text-in-primary);
+}
+
+html, body {
+    height: 100vh;
+}
+
+body {
+    background-color: var(--color-background-dark);
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#container {
+    width: 100vw; /* viewport width*/
+    height: 100vh; /* viewport height*/    
+}

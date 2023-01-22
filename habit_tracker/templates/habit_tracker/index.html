@@ -1,18 +1,43 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <title>Habit Tracker</title>
 
-  <style>
-    body {
-      text-align: center;
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'habit_tracker/css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/page-landing.css' %}">
+
 </head>
-<body>
-  <h1>Habit Tracker let's goo</h1>
+<body id="page-landing">
+  <div id="container">
+    
+    <!-- <nav></nav> -->
+    <div class="top-bar-container">
+      <div>Habit Tracker Logo</div>
+      <div>Profile Icon</div>
+    </div>
+    
+    <div id="month-week-title">
+      <h1>Week #1 - January</h1>
+    </div>
+    <div id="habits-grid">
+      <div id="previous-week-arrow">
+        <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+      </div>
+
+      <div id="habits-weekdays">
+        <img src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task">
+      </div>
+
+      <div id="next-week-arrow">
+        <img src="{% static 'habit_tracker/images/icons/anchor-right-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+      </div>
+    </div>
+  </div>
 </body>
 </html>

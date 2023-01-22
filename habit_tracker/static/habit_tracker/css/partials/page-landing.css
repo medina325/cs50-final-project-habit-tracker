@@ -1,0 +1,48 @@
+.top-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px 30px 10px;
+
+    font-size: 30px;
+}
+
+#month-week-title {
+    text-align: center;
+    font-size: 30px;
+}
+
+#habits-grid
+{
+    display: grid;
+    grid-column-gap: 20px;
+    grid-template-columns: 1fr 15fr 1fr;
+    height: 80vh;
+}
+
+#previous-week-arrow, #next-week-arrow{
+    align-self:center;
+}
+
+#previous-week-arrow img {
+    float: left;
+    margin-left: 50px;
+}
+
+#next-week-arrow img {
+    float: right;
+    margin-right: 50px;
+}
+
+img[src $= "svg"] {
+    width: 50px;
+    height: 50px;
+}
+
+#habits-weekdays {
+    display: inline-block;
+    margin: auto;
+}
+
+/* For visualizing divs */
+/* border: 5px solid rgb(234, 230, 100); */
