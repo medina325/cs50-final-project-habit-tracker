@@ -23,20 +23,63 @@
     </div>
     
     <div id="month-week-title">
-      <h1>Week #1 - January</h1>
+      <h1>Habit Tracker</h1>
     </div>
     <div id="habits-grid">
-      <div id="previous-week-arrow">
+      <!-- <div id="previous-week-arrow">
         <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
-      </div>
-
-      <div id="habits-weekdays">
-        <img src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task">
-      </div>
-
-      <div id="next-week-arrow">
+      </div> -->
+      
+      <table id="habits-tracker-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+            <th>S</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <!-- <img src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task"> -->
+              Gym
+            </td>
+              
+            <td></td>
+            <td class="habit-tracked"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <img src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task">
+            </td>
+              
+            <td></td>
+            <td class="habit-tracked"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </table>
+      <div></div>
+      <div id="next-week-arrow" style="margin: auto;">
         <img src="{% static 'habit_tracker/images/icons/anchor-right-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+        Check stats
       </div>
+      <div></div>
     </div>
   </div>
 </body>

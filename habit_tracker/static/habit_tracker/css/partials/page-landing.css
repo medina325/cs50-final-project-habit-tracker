@@ -2,47 +2,82 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 10px 30px 10px;
+    padding: 10px 10px 70px 10px;
 
+    background-color: var(--color-background-dark-3);
     font-size: 30px;
 }
 
 #month-week-title {
     text-align: center;
+    max-width: 400px;
+    margin-top: -50px;
+    margin-inline: auto;
+    padding: 10px 15px 10px 15px;
+    
+    border-radius: 10px;
     font-size: 30px;
-}
+    background-color: var(--color-background-dark-2);
 
-#habits-grid
-{
-    display: grid;
-    grid-column-gap: 20px;
-    grid-template-columns: 1fr 15fr 1fr;
-    height: 80vh;
 }
 
 #previous-week-arrow, #next-week-arrow{
-    align-self:center;
+    align-self: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
-#previous-week-arrow img {
+/* #previous-week-arrow img {
     float: left;
     margin-left: 50px;
-}
+} */
 
-#next-week-arrow img {
+/* #next-week-arrow img {
     float: right;
     margin-right: 50px;
-}
+} */
 
 img[src $= "svg"] {
     width: 50px;
     height: 50px;
 }
 
-#habits-weekdays {
-    display: inline-block;
-    margin: auto;
+#habits-grid {
+    display: grid;
+    grid-row-gap: 20px;
+    grid-template-columns: 10fr 1fr;
+
+    margin-top: 10px;
+    height: 80vh;
 }
 
+#habits-tracker-table {
+    grid-row-start: 1;
+    grid-row-end: 4;
+    font-size: large;
+}
+
+/* #habits-tracker-table tr:nth-child(1) { */
+#habits-tracker-table tr:not(:last-child) {
+    height: 20%;
+}
+
+#habits-tracker-table tr td:nth-child(1) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#habits-tracker-table > td, th
+{
+    padding: 5px;
+}
+
+#habits-tracker-table > thead > tr > th {
+    font-size: xx-large;
+    padding: 50px;
+}
 /* For visualizing divs */
 /* border: 5px solid rgb(234, 230, 100); */
