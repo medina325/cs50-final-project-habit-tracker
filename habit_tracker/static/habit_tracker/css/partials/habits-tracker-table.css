@@ -1,0 +1,44 @@
+#habits-tracker-grid {
+    display: grid;
+    grid-template-columns: auto repeat(7, 1fr);
+    row-gap: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+div.habit-column {
+    font-size: 50px;
+    margin: auto;
+}
+
+.habits-tracker-header {
+    font-size: xxx-large;
+    margin-bottom: 20px;
+}
+
+.habit-tracked {
+    background-color: var(--color-background-dark-2);
+}
+
+div.fixed-aspect-ratio-circle {
+    cursor: pointer;
+}
+
+/* Fixed aspect ratio circle trick */
+div.flex-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fixed-aspect-ratio-circle::before {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+}
+
+.fixed-aspect-ratio-circle {
+    width: 60%;
+    border-radius: 50%;
+    border: 2px solid var(--color-background-dark-2);
+}
