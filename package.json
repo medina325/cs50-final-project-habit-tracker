@@ -1,0 +1,22 @@
+{
+  "name": "cs50-final-project-habit-tracker",
+  "version": "1.0.0",
+  "description": "Final project of the CS50's Web Programming with Python and Javascript course - Habit Tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/medina325/cs50-final-project-habit-tracker.git"
+  },
+  "author": "Gabriel Medina Braga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/medina325/cs50-final-project-habit-tracker/issues"
+  },
+  "homepage": "https://github.com/medina325/cs50-final-project-habit-tracker#readme",
+  "dependencies": {
+    "bootstrap": "^5.2.3"
+  }
+}
