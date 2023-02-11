@@ -4,15 +4,17 @@
     --color-background: #e6e6e6;
     --color-primary:#2a2a2a;
 
-    --color-background-dark: #1d1d1d;
+    --color-background-dark-1: #1d1d1d;
     --color-background-dark-2: #7855ca;
     --color-background-dark-3: #31015c;
+    --color-background-dark-4: #18022b;
     --color-primary-dark: #D4C2FF;
 }
 
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     color: var(--color-primary-dark);
 }
 
@@ -21,14 +23,40 @@ html, body {
 }
 
 body {
-    background-color: var(--color-background-dark);
+    background-color: var(--color-background-dark-1);
     font-size: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-#container {
-    width: 100vw; /* viewport width*/
-    height: 100vh; /* viewport height*/    
+#layout-container {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+ 
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-dark-1 {    
+    background-color: var(--color-background-dark-1);
+}
+
+.bg-dark-2 {    
+    background-color: var(--color-background-dark-2);
+}
+
+.bg-dark-3 {    
+    background-color: var(--color-background-dark-3);
+}
+
+.bg-dark-4 {    
+    background-color: var(--color-background-dark-4);
+}
+
+.vr {
+    background-color: var(--color-background-dark-3);
 }
