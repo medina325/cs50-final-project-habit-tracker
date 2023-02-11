@@ -1,0 +1,93 @@
+#signup-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 50vw;
+    
+    margin: auto;
+    margin-top: -50px;
+    min-height: 80vh;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: darkgray;
+}
+
+
+#signup-form input {
+    font-family:Arial, Helvetica, sans-serif;
+    border: none;
+    height: 30px;
+    max-width: 90%;
+    padding-inline-start: 10px;
+    border-radius: 10px;
+}
+
+.blue {
+    background-color: blue;
+}
+
+#login-flex-container {
+    flex: 1;
+    display: flex;
+}
+
+/* For even columns */
+#login-flex-container > * {
+    flex-basis: 100%;
+}
+
+.login-nav {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    font-size: x-large;
+    font-family: sans-serif;
+    color: var(--color-background-dark-2);
+}
+
+.login-nav a {
+    text-decoration: none;
+    color: inherit;
+    z-index: 1;
+    position: relative;
+}
+
+.login-nav > a:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background: var(--color-background-dark-3);
+    visibility: hidden;
+    border-radius: 5px;
+    transform: scaleX(0);
+    transition: .25s linear;
+}
+
+.login-nav > a:hover:before,
+.login-nav > a:focus:before {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+.login-nav a:focus:not(.focus-visible) {
+    outline: none;
+}
+
+.active {
+    display: block;
+}
+
+.inactive {
+    display: none;
+}
+
+.sample_screenshot {
+    width: auto;
+    height: auto;
+    max-width: 25rem;
+    max-height: 25rem;
+    transform: rotate(20deg);
+}

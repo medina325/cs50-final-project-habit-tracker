@@ -1,0 +1,13 @@
+.top-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+
+    background-color: var(--color-background-dark-2);
+}
+
+.logo {
+    width: 3rem;
+    height: 3rem;
+}

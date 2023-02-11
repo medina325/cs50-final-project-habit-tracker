@@ -1,13 +1,3 @@
-.top-bar-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 10px 70px 10px;
-
-    background-color: var(--color-background-dark-3);
-    font-size: 30px;
-}
-
 #month-week-title {
     text-align: center;
     max-width: 400px;
