@@ -60,3 +60,13 @@ main {
 .vr {
     background-color: var(--color-background-dark-3);
 }
+
+.light {
+    fill: var(--color-background-dark-3);
+    color: var(--color-background-dark-3);
+}
+
+.dark {
+    fill: var(--color-background-3);
+    color: var(--color-background-3);
+}
