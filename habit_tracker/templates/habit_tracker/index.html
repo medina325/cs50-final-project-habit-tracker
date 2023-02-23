@@ -8,7 +8,6 @@
 {% block css %}
   <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/page-landing.css' %}">
   <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/habits-tracker-table.css' %}">
-  <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/navbar.css' %}">
 {% endblock %}
 
 {% block js %}
@@ -19,34 +18,57 @@
   <div id="month-week-title">
     <h1>Habit Tracker</h1>
   </div>
-  
+
+  <div id="week-display">
+    <!-- Confuso? -->
+    {% if week.has_previous %}
+      <a href="?week={{ week.previous_page_number }}" class="week-scroller btn btn-success">
+    {% else %}
+      <a href="?week=1" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
+    {% endif %}
+        <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+      </a>
+    <div>
+      {{ week.0 | date:"d/m"}} - {{ week | last | date:"d/m"}}
+    </div>
+    {% if week.has_next %}
+      <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-success">
+    {% else %}
+      <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
+    {% endif %}
+        <img src="{% static 'habit_tracker/images/icons/anchor-right-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+      </a>
+  </div>
+
   <div id="habits-tracker-flex-container">
     <div class="habits-tracker-grid-container">
       <div id="habits-tracker-grid">
 
-        {% with 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday' as weekdays %}
-            <div></div>
-            {% for day in weekdays.split %}
-              <div class="habits-tracker-header">{{ day|make_list|first }}</div>
-            {% endfor %}
+        {% with 'M T W T F S S' as weekdays %}
+          <div></div>
+          {% for day in weekdays.split %}
+            <div class="habits-tracker-header">{{ day }}</div>
+          {% endfor %}
 
+          {% for habit in habits %}
             <div class="habit-column">
-              Gym
+              {{ habit.name }}
             </div>
-            {% for _ in weekdays.split %}
+            {% for day in week %}
               <div class="flex-circle-container">
-                <div class="fixed-aspect-ratio-circle"></div>
+                <div class="fixed-aspect-ratio-circle {% if day in habit.tracked_dates %} habit-tracked{% endif %}" data-tracking-day="{{ day | date:'c' }}"></div>
               </div>
             {% endfor %}
+          {% endfor %}
 
-            <div id="add-new-habit-button" class="habit-column">
-              <img id="new-habit-button" src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task" data-bs-toggle="modal" data-bs-target="#newHabitModal">
+          <div id="add-new-habit-button" class="habit-column">
+            <img id="new-habit-button" src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task" data-bs-toggle="modal" data-bs-target="#newHabitModal">
+          </div>
+          {% for _ in weeks %}
+            <div class="flex-circle-container">
+              <div class="fixed-aspect-ratio-circle disabled"></div>
             </div>
-            {% for _ in weekdays.split %}
-              <div class="flex-circle-container">
-                <div class="fixed-aspect-ratio-circle disabled"></div>
-              </div>
-            {% endfor %}
+          {% endfor %}
         {% endwith %}
 
       </div>
@@ -73,6 +95,8 @@
         <div class="modal-body">
           <form id="new-habit-form">
             {% csrf_token %}
+            <input type="hidden" value="{{ year }}" name="year">
+            <input type="hidden" value="{{ month }}" name="month">
             <div class="row">
               
               <div class="col">

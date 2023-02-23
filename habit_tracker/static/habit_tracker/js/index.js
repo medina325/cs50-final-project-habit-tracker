@@ -42,31 +42,38 @@ function hideAndCleanModalForm() {
 }
 
 function createHabit() {
-  const inputs = [...document.querySelectorAll('#new-habit-form input')];
-
   let trackingWeekdays = {}
   document.querySelectorAll('.form-check-input').forEach(radio => {
     trackingWeekdays[radio.value] = radio.checked;
   })
+
+  const habitName = document.querySelector('#input-habit-name').value
   
   fetch('/create_habit', {
     method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value
+    },
+    mode: "same-origin",
     body: JSON.stringify({
       data: {
-        'habit_name': document.querySelector('#input-habit-name').value,
-        'weekdays': trackingWeekdays
+        'name': habitName,
+        'weekdays': trackingWeekdays,
+        'year': parseInt(document.querySelector('[name=year]').value),
+        'month': parseInt(document.querySelector('[name=month]').value)
       }
     })
   })
   .then(response => {
     const newHabbitButton = document.getElementById('add-new-habit-button');
-    newHabitRow = createHabitRow(inputs[0].value, newHabbitButton.parentNode, newHabbitButton)
+    newHabitRow = createHabitRow(habitName, newHabbitButton.parentNode, newHabbitButton)
     hideAndCleanModalForm();
 
     // Create small popup with the response message and a undo option
   })
-  .catch(response => {
+  .catch(err => {
     console.log('What is the problem??')
+    throw err;
   });
     
   return false;
