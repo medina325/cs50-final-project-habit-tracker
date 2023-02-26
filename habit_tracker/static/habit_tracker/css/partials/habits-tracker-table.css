@@ -22,7 +22,7 @@ div.habit-column {
     margin-bottom: 20px;
 }
 
-.habit-tracked {
+[data-state="tracked"] {
     background-color: var(--color-background-dark-2);
 }
 

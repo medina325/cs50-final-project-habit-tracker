@@ -7,8 +7,9 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, HabitTracker, Habit
+from .models import User, HabitTracker, Habit, TrackedDate
 from .utils import is_username_an_email, get_week
 
 def index(request, year=date.today().year, month=date.today().month):
@@ -32,16 +33,80 @@ def index(request, year=date.today().year, month=date.today().month):
         .first()
     )
     
+    habits = [
+        {
+            'name': habit.name,
+            'tracked_dates': [tracked_date.tracked_date for tracked_date in habit.tracked_dates.all()]
+        }
+        for habit in habit_tracker.habits.all()
+    ] if habit_tracker else []
+    
     return render(request, 'habit_tracker/index.html', {
         'year': year,
         'month': month,
         'week': week,
         'active': habit_tracker.active if habit_tracker else True,
-        'habits': [
-            {'name': habit.name, 'tracked_dates': [date(2023, 2, 10)]}
-            for habit in habit_tracker.habits.all()
-        ] if habit_tracker else [],
+        'habits': habits
     })
+
+@login_required
+@csrf_exempt
+def track_habit(request):
+    """
+    Consiste em filtrar um hábito e relacioná-lo a um TrackedDate
+    """
+    
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+
+        # TODO Validate form
+
+        habit = (
+            request.user.habits
+            .filter(name=data['name'],
+                    year=data['year'],
+                    month=data['month'])
+            .first()
+        )
+        
+        # TODO Check if there's already a tracked date for this date
+        # TODO Also add validation on the dataase
+        tracked_date = TrackedDate(habit=habit,
+                                   tracked_date=date.fromisoformat(data['date']),
+                                   value='yes')
+        tracked_date.save()
+
+        return JsonResponse({"message": f"Date {data['date']} tracked"}, status=201)
+    
+    return JsonResponse({'error': 'Method should be POST'}, status=405)
+
+@login_required
+@csrf_exempt
+def untrack_habit(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+
+        # TODO Validate form
+
+        # TODO Find best way to validate if only one result is returned
+        habit = (
+            request.user.habits
+            .filter(name=data['name'],
+                    year=data['year'],
+                    month=data['month'])
+            .first()
+        )
+
+        # TODO Find best way to validate if only one result is returned
+        tracked_date = TrackedDate.objects.filter(
+            habit=habit,
+            tracked_date=date.fromisoformat(data['date'])
+        ).first()
+        tracked_date.delete()
+
+        return JsonResponse({"message": f"Habit {habit.name} untracked for date {data['date']}"}, status=200)
+    
+    return JsonResponse({'error': 'Method should be POST'}, status=405)
 
 @login_required
 def create_habit(request):
@@ -59,17 +124,15 @@ def create_habit(request):
         habit_tracker = HabitTracker.objects.filter(**habit_tracker_data).first()
 
         if not habit_tracker:
-            new_habit = HabitTracker(**habit_tracker_data)
-            new_habit.save()
+            habit_tracker = HabitTracker(**habit_tracker_data)
+            habit_tracker.save()
             
         habit = Habit(user=request.user,
                       habit_tracker=habit_tracker,
                       name=data['name'])
         habit.save()
 
-        return JsonResponse({
-            "message": "New habit added",
-        }, status=201)
+        return JsonResponse({'message': 'New habit added'}, status=201)
     
     return JsonResponse({"error": "Method should be POST"}, status=405)
 
@@ -83,6 +146,7 @@ def update_habit(request):
     pass
 
 def delete_habit(request):
+    # TODO Adicionar soft delete
     pass
 # --------------------------------------------------------- users app ------------------------------------------------------------------------------------------------------
 

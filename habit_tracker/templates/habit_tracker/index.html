@@ -28,8 +28,10 @@
     {% endif %}
         <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
       </a>
-    <div>
-      {{ week.0 | date:"d/m"}} - {{ week | last | date:"d/m"}}
+    <div id="week-range">
+      <span data-date="{{ week.0 | date:'Y-m-d' }}">{{ week.0 | date:"d/m"}}</span>
+      -
+      <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
     </div>
     {% if week.has_next %}
       <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-success">
@@ -56,7 +58,7 @@
             </div>
             {% for day in week %}
               <div class="flex-circle-container">
-                <div class="fixed-aspect-ratio-circle {% if day in habit.tracked_dates %} habit-tracked{% endif %}" data-tracking-day="{{ day | date:'c' }}"></div>
+                <div class="fixed-aspect-ratio-circle" data-habit-name="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
               </div>
             {% endfor %}
           {% endfor %}
@@ -64,7 +66,7 @@
           <div id="add-new-habit-button" class="habit-column">
             <img id="new-habit-button" src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task" data-bs-toggle="modal" data-bs-target="#newHabitModal">
           </div>
-          {% for _ in weeks %}
+          {% for _ in week %}
             <div class="flex-circle-container">
               <div class="fixed-aspect-ratio-circle disabled"></div>
             </div>

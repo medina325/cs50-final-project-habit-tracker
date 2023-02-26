@@ -1,10 +1,27 @@
-function toggleTrackingOnClick(el) {
-  el.onclick = () => {
-    el.classList.toggle('habit-tracked');
-  };
+const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+function getYear() {
+  return parseInt(document.querySelector('[name=year]').value);
 }
 
-const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+function getMonth() {
+  return parseInt(document.querySelector('[name=month]').value);
+}
+
+function getTrackingDates() {
+  const [start, end] = [
+    ...document.querySelectorAll('span[data-date]')
+  ].map(span => span.dataset.date);
+  
+  for (var arr=[], dt=new Date(start); dt <= new Date(end); dt.setDate(dt.getDate()+1))
+  {
+    arr.push(
+      new Date(dt).toISOString().slice(0, 10)
+    );
+  }
+
+  return arr;
+};
 
 function createHabitRow(habitName, parentDiv, newHabbitButton) {
   let newHabitNameCol = document.createElement('div');
@@ -13,13 +30,16 @@ function createHabitRow(habitName, parentDiv, newHabbitButton) {
   newHabitNameCol.innerText = habitName;
 
   parentDiv.insertBefore(newHabitNameCol, newHabbitButton);
-
-  weekdays.forEach((weekday) => {
+  const trackingDates = getTrackingDates();
+  trackingDates.reverse().forEach(trackingDate => {
     let habitTrackingCircleContainer = document.createElement('div');
     habitTrackingCircleContainer.className = 'flex-circle-container';
 
     let habitTrackingCircle = document.createElement('div');
     habitTrackingCircle.className = 'fixed-aspect-ratio-circle';
+    habitTrackingCircle.dataset.habitName = habitName;
+    habitTrackingCircle.dataset.trackingDate = trackingDate;
+    habitTrackingCircle.dataset.state = '';
 
     habitTrackingCircleContainer.appendChild(habitTrackingCircle);
     toggleTrackingOnClick(habitTrackingCircle);
@@ -59,8 +79,8 @@ function createHabit() {
       data: {
         'name': habitName,
         'weekdays': trackingWeekdays,
-        'year': parseInt(document.querySelector('[name=year]').value),
-        'month': parseInt(document.querySelector('[name=month]').value)
+        'year': getYear(),
+        'month': getMonth()
       }
     })
   })
@@ -77,12 +97,50 @@ function createHabit() {
   });
     
   return false;
-};
+}
+
+function toggleTrackingOnClick(el) {
+  const stateMap = {
+    tracked: {
+      url: '/untrack_habit',
+      toggleState: 'notTracked'
+    },
+    notTracked: {
+      url: '/track_habit',
+      toggleState: 'tracked'
+    }
+  };
+
+  const {url, toggleState} = stateMap[el.dataset.state]
+
+  el.onclick = () => {
+    fetch(url, {
+      method: 'POST',
+      mode: "same-origin",
+      body: JSON.stringify({
+        data: {
+          'name': el.dataset.habitName,
+          'year': getYear(),
+          'month': getMonth(),
+          'date': el.dataset.trackingDate,
+        }
+      })  
+    })
+    .then(response => response.json())
+    .then(response => {
+      el.dataset.state = toggleState;
+      toggleTrackingOnClick(el);
+    })
+    .catch(err => {
+      console.log('Error???');
+    });
+  };
+}
 
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Component 1 - Day habit tracker
-  document.querySelectorAll('.fixed-aspect-ratio-circle')
+  // Component 1 - Add tracking functionality for every "tracking unit"
+  document.querySelectorAll('.fixed-aspect-ratio-circle[data-tracking-date]')
     .forEach(toggleTrackingOnClick);
 
   // Component 2 - Add new habit
