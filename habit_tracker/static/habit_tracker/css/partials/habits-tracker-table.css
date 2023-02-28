@@ -26,12 +26,12 @@ div.habit-column {
     background-color: var(--color-background-dark-2);
 }
 
-div.fixed-aspect-ratio-circle {
+.fixed-aspect-ratio-circle {
     cursor: pointer;
 }
 
 /* Fixed aspect ratio circle trick */
-div.flex-circle-container {
+.flex-circle-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,4 +56,10 @@ div.flex-circle-container {
 
 .modal-header {
     background-color: var(--color-background-dark-2);
+}
+
+.disabled {
+    opacity: 0.3;
+    cursor: pointer;
+    pointer-events: none;
 }

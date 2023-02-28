@@ -92,7 +92,6 @@ function createHabit() {
     // Create small popup with the response message and a undo option
   })
   .catch(err => {
-    console.log('What is the problem??')
     throw err;
   });
     
@@ -126,13 +125,21 @@ function toggleTrackingOnClick(el) {
         }
       })  
     })
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      return Promise.reject(response);
+    })
     .then(response => {
       el.dataset.state = toggleState;
       toggleTrackingOnClick(el);
     })
-    .catch(err => {
-      console.log('Error???');
+    .catch(response => {
+      response.json().then(json_response => {
+        return json_response.error;
+      })
     });
   };
 }

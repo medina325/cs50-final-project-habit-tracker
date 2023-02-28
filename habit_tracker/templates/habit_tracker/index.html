@@ -58,7 +58,7 @@
             </div>
             {% for day in week %}
               <div class="flex-circle-container">
-                <div class="fixed-aspect-ratio-circle" data-habit-name="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
+                <div class="fixed-aspect-ratio-circle {% if day.month != month %}disabled{% endif %}" data-habit-name="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
               </div>
             {% endfor %}
           {% endfor %}

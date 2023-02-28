@@ -57,9 +57,12 @@ def track_habit(request):
     """
     
     if request.method == 'POST':
+        # TODO Validate form
         data = json.loads(request.body)['data']
 
-        # TODO Validate form
+        tracked_date = date.fromisoformat(data['date'])
+        if tracked_date.month != data['month']:
+            return JsonResponse({'error': 'date field\'s month should match month field'}, status=400)
 
         habit = (
             request.user.habits
@@ -84,9 +87,12 @@ def track_habit(request):
 @csrf_exempt
 def untrack_habit(request):
     if request.method == 'POST':
+        # TODO Validate form
         data = json.loads(request.body)['data']
 
-        # TODO Validate form
+        tracked_date = date.fromisoformat(data['date'])
+        if tracked_date.month != data['month']:
+            return JsonResponse({'error': 'date field\'s month should match month field'}, status=400)
 
         # TODO Find best way to validate if only one result is returned
         habit = (
@@ -100,7 +106,7 @@ def untrack_habit(request):
         # TODO Find best way to validate if only one result is returned
         tracked_date = TrackedDate.objects.filter(
             habit=habit,
-            tracked_date=date.fromisoformat(data['date'])
+            tracked_date=tracked_date
         ).first()
         tracked_date.delete()
 
