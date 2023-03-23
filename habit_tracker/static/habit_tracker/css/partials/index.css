@@ -1,0 +1,154 @@
+/* Não faço ideia de como descrever */
+#month-week-title {
+    text-align: center;
+    margin-inline: auto;
+    
+    margin-top: -50px;
+    max-width: 400px;
+    
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    font-size: 30px;
+    background-color: var(--color-background-dark-3);
+}
+
+#week-display {
+    display: flex;
+    margin-top: 2rem;
+    margin-inline: auto;
+    align-items: center;
+
+    gap: 1rem;
+}
+
+.week-scroller {
+    border-radius: 10px;
+}
+
+#habits-tracker-flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+  
+.habits-tracker-grid-container {
+    flex-basis: 0;
+    flex-grow: 999;
+    /* border: 1px solid var(--color-background-dark-2); */
+}
+
+#check-stats-sidebar {
+    flex-basis: 10rem;
+    flex-grow: 1;
+    min-height: 100vh;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* border: 1px solid var(--color-background-dark-3); */
+}
+
+#check-stats-sidebar > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+img[src $= "svg"] {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Habit tracker's grid */
+#habits-tracker-grid {
+    display: grid;
+    grid-template-columns: 2fr repeat(7, 1fr);
+    row-gap: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#new-habit-button {
+    cursor: pointer;
+    width: 70px;
+    height: 70px;
+}
+
+div.habit-column {
+    font-size: 50px;
+    margin: auto;
+}
+
+.habits-tracker-header {
+    font-size: xxx-large;
+    margin-bottom: 20px;
+}
+
+[data-state="tracked"] {
+    background-color: var(--color-background-dark-2);
+}
+
+.fixed-aspect-ratio-circle {
+    cursor: pointer;
+}
+
+/* Fixed aspect ratio circle trick */
+.flex-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fixed-aspect-ratio-circle::before {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+}
+
+.fixed-aspect-ratio-circle {
+    width: 60%;
+    border-radius: 50%;
+    border: 2px solid var(--color-background-dark-2);
+}
+
+/* New habit modal */
+.modal {
+    --bs-modal-bg: var(--color-background-dark-1);
+}
+
+.modal-header {
+    background-color: var(--color-background-dark-2);
+}
+
+.disabled {
+    opacity: 0.3;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+/* Year month picker */
+
+.btn-month {
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+}
+
+#year-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 1rem;
+}
+
+.year-scroller {
+    border-radius: 20px;
+}
+
+#months-container {
+    padding: 1rem;
+}

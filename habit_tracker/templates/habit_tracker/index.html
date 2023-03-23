@@ -6,8 +6,7 @@
 {% endblock %}
 
 {% block css %}
-  <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/page-landing.css' %}">
-  <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/habits-tracker-table.css' %}">
+  <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/index.css' %}">
 {% endblock %}
 
 {% block js %}
@@ -29,9 +28,16 @@
         <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
       </a>
     <div id="week-range">
-      <span data-date="{{ week.0 | date:'Y-m-d' }}">{{ week.0 | date:"d/m"}}</span>
-      -
-      <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
+      <div>
+        <span data-date="{{ week.0 | date:'Y-m-d' }}">{{ week.0 | date:"d/m"}}</span>
+        -
+        <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
+      </div>
+      <div style="text-align: center;">
+        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#calendarModal">
+          <i class="bi bi-calendar4-week" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Choose a year and a month for your calendar"></i>
+        </button>
+      </div>
     </div>
     {% if week.has_next %}
       <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-success">
@@ -85,6 +91,8 @@
 
   </div>
 
+  <!-- Modals -->
+
   <div class="modal fade" id="newHabitModal" tabindex="-1" aria-labelledby="newHabitModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -135,4 +143,71 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div id="year-container">
+            <button class="year-scroller btn btn-success" data-year-scroll="previous">
+              <i class="bi bi-arrow-left" style="font-size: 1rem; color: white;"></i>
+            </button>
+            <div id="habit-tracker-year">
+              {{ year }}
+            </div>
+            <button class="year-scroller btn btn-success" data-year-scroll="next">
+              <i class="bi bi-arrow-right" style="font-size: 1rem; color: white;"></i>
+            </button>
+          </div>
+          <div id="months-container">
+            <div class="row mb-3 gx-3">
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="1">Jan</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="2">Feb</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="3">Mar</button>
+              </div>
+            </div>
+            <div class="row mb-3 gx-3">
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="4">Apr</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="5">May</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="6">Jun</button>
+              </div>
+            </div>
+            <div class="row mb-3 gx-3">
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="7">Jul</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="8">Aug</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="9">Sep</button>
+              </div>
+            </div>
+            <div class="row mb-3 gx-3">
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="10">Oct</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="11">Nov</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-success btn-month" data-month="12">Dec</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

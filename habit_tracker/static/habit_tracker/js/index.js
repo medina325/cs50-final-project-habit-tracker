@@ -1,10 +1,10 @@
 const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function getYear() {
+function getCurrentHabitTrackerYear() {
   return parseInt(document.querySelector('[name=year]').value);
 }
 
-function getMonth() {
+function getCurrentHabitTrackerMonth() {
   return parseInt(document.querySelector('[name=month]').value);
 }
 
@@ -79,8 +79,8 @@ function createHabit() {
       data: {
         'name': habitName,
         'weekdays': trackingWeekdays,
-        'year': getYear(),
-        'month': getMonth()
+        'year': getCurrentHabitTrackerYear(),
+        'month': getCurrentHabitTrackerMonth()
       }
     })
   })
@@ -119,8 +119,8 @@ function toggleTrackingOnClick(el) {
       body: JSON.stringify({
         data: {
           'name': el.dataset.habitName,
-          'year': getYear(),
-          'month': getMonth(),
+          'year': getCurrentHabitTrackerYear(),
+          'month': getCurrentHabitTrackerMonth(),
           'date': el.dataset.trackingDate,
         }
       })  
@@ -132,7 +132,7 @@ function toggleTrackingOnClick(el) {
 
       return Promise.reject(response);
     })
-    .then(response => {
+    .then(() => {
       el.dataset.state = toggleState;
       toggleTrackingOnClick(el);
     })
@@ -152,5 +152,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Component 2 - Add new habit
   document.querySelector('#new-habit-form').onsubmit = () => createHabit();
-  
+
+  // Component 3 - Scroll through the years
+  document.querySelectorAll('.year-scroller').forEach(el => {
+    el.onclick = () => {
+      let currentYearElement = document.querySelector('#habit-tracker-year');
+      const selectedYear = parseInt(currentYearElement.innerText);
+
+      if (el.dataset.yearScroll == 'next')
+        currentYearElement.innerHTML = selectedYear + 1;
+      else if (el.dataset.yearScroll == 'previous')
+        currentYearElement.innerHTML = selectedYear - 1;
+    }
+  });
+
+  // Component 4 - Pick a month/year for the habit tracker
+  document.querySelectorAll('.btn-month').forEach(el => {
+    el.onclick = () => {
+      let currentYearElement = document.querySelector('#habit-tracker-year');
+      const year = currentYearElement.innerText;
+      const month = el.dataset.month;
+      const baseURL = window.location.origin;
+      window.location.href = new URL(`${baseURL}/${year}/${month}`);
+    }
+  });
+
+
+  // Initializing Tooltips
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });
