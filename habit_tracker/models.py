@@ -42,12 +42,12 @@ class HabitTracker(models.Model):
     def __str__(self):
         return f"{self.user.username.capitalize()}'s Habit Tracker for {self.month_name} - {self.year}"
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['user', 'year', 'month']
-    #         )
-    #     ]
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'year', 'month'], name='unique_habit_tracker'
+            )
+        ]
 
 class Habit(models.Model):
     user = models.ForeignKey('User', related_name='habits', on_delete=models.CASCADE)
@@ -79,17 +79,17 @@ class Habit(models.Model):
             f"month {self.habit_tracker.month_name} and year {self.habit_tracker.year}"
         )
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['name', 'habit_tracker']
-    #         )
-    #     ]
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'habit_tracker', 'name'], name='unique_user_habit_per_habit_tracker'
+            )
+        ]
     
 class TrackedDate(models.Model):
     habit = models.ForeignKey('Habit', related_name='tracked_dates', on_delete=models.CASCADE)
 
-    tracked_date = models.DateField()
+    date = models.DateField()
     value = models.TextField()
 
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -97,21 +97,21 @@ class TrackedDate(models.Model):
 
     @property
     def isoformat(self):
-        return self.tracked_date.isoformat()
+        return self.date.isoformat()
 
     def serialize(self):
         return {
             'habit': self.habit.id,
-            'tracked_date': self.tracked_date,
+            'date': self.date,
             'value': self.value,
         }
 
     def __str__(self):
-        return f"Date {self.tracked_date} tracked for the habit {self.habit.capitalized_name}"
+        return f"Date {self.date} tracked for the habit {self.habit.capitalized_name}"
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['tracked_date', 'habit']
-    #         )
-    #     ]
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['date', 'habit'], name='unique_tracking_date_for_habit'
+            )
+        ]

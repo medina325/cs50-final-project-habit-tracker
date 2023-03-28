@@ -36,7 +36,7 @@ def index(request, year=date.today().year, month=date.today().month):
     habits = [
         {
             'name': habit.name,
-            'tracked_dates': [tracked_date.tracked_date for tracked_date in habit.tracked_dates.all()]
+            'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
         }
         for habit in habit_tracker.habits.all()
     ] if habit_tracker else []
@@ -75,7 +75,7 @@ def track_habit(request):
         # TODO Check if there's already a tracked date for this date
         # TODO Also add validation on the dataase
         tracked_date = TrackedDate(habit=habit,
-                                   tracked_date=date.fromisoformat(data['date']),
+                                   date=date.fromisoformat(data['date']),
                                    value='yes')
         tracked_date.save()
 
@@ -106,7 +106,7 @@ def untrack_habit(request):
         # TODO Find best way to validate if only one result is returned
         tracked_date = TrackedDate.objects.filter(
             habit=habit,
-            tracked_date=tracked_date
+            date=tracked_date
         ).first()
         tracked_date.delete()
 
