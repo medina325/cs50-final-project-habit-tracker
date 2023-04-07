@@ -60,7 +60,17 @@
 
           {% for habit in habits %}
             <div class="habit-column">
-              {{ habit.name }}
+              <div class="habit-name">
+                {{ habit.name }}
+              </div>
+              <div class="hover-habit">
+                <button type="button" class="btn btn-dark edit-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#editHabitModal">
+                  <i class="bi bi-pencil-square" style="font-size: 2rem; color: var(--color-background-dark-2);"></i>
+                </button>
+                <button type="button" class="btn btn-dark">
+                  <i class="bi bi-trash3" style="font-size: 2rem; color: red;"></i>
+                </button>
+              </div>
             </div>
             {% for day in week %}
               <div class="flex-circle-container">
@@ -69,8 +79,10 @@
             {% endfor %}
           {% endfor %}
 
-          <div id="add-new-habit-button" class="habit-column">
-            <img id="new-habit-button" src="{% static 'habit_tracker/images/icons/plus-square-svgrepo-com.svg' %}" alt="Add task" data-bs-toggle="modal" data-bs-target="#newHabitModal">
+          <div id="add-new-habit-button">
+            <button type="button" class="btn">
+              <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
+            </button>
           </div>
           {% for _ in week %}
             <div class="flex-circle-container">
@@ -92,6 +104,58 @@
   </div>
 
   <!-- Modals -->
+
+  <div class="modal fade" id="editHabitModal" tabindex="-1" aria-labelledby="editHabitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editHabitModalLabel">Edit your habit</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="edit-habit-form">
+            {% csrf_token %}
+            <input type="hidden" value="{{ year }}" name="year">
+            <input type="hidden" value="{{ month }}" name="month">
+            <input type="hidden" value="" name="oldHabitName">
+            <div class="row">
+              
+              <div class="col">
+                <label for="input-edit-habit-name" class="form-label">Habit name</label>
+                <input id="input-edit-habit-name" type="text" class="form-control" aria-label="Habit name" required>
+              </div>
+              
+              <div class="col">
+                <div>Tracking Days</div>
+                <div class="row">
+
+                  {% with 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday' as weekdays %}
+                    {% for w in weekdays.split %}
+                      <div class="col">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="{{ w }}" value="{{ w }}">
+                          <label class="form-check-label" for="{{ w }}">{{ w|make_list|first }}</label>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% endwith %}
+
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button id="edit-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Save habit</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <div class="modal fade" id="newHabitModal" tabindex="-1" aria-labelledby="newHabitModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -137,7 +201,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" form="new-habit-form" class="btn btn-success" autocomplete="off">Create new habit</button>
+          <button id="new-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Create new habit</button>
         </div>
 
       </div>
@@ -205,6 +269,31 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <!-- Success Toast -->
+  <div class="toast-container position-absolute p-3 bottom-0 start-50" id="toastPlacement">
+    <div id="habit-toast-success" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body border border-2 border-success rounded">
+        <div class="d-flex justify-content-center align-items-center gap-1">
+          <span id="habit-toast-success__message"></span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fail Toast -->
+  <div class="toast-container position-absolute p-3 bottom-0 start-50" id="toastPlacement">
+    <div id="habit-toast-fail" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body border border-2 border-danger rounded">
+        <div class="d-flex justify-content-center align-items-center gap-1">
+          <span id="habit-toast-fail__message"></span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       </div>
     </div>

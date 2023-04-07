@@ -76,9 +76,45 @@ img[src $= "svg"] {
     height: 70px;
 }
 
-div.habit-column {
-    font-size: 50px;
+.habit-column {
+    display: grid;
+    grid-template-columns: 1fr;
     margin: auto;
+    
+    background-color: var(--color-background-dark-3);
+    padding-inline: 15px;
+    min-width: -webkit-fill-available;
+    border-radius: 25px;
+    font-size: 50px;
+}
+
+.habit-column:hover {
+    cursor: pointer;
+    background-color: var(--color-background-dark-4);
+    transition: all 500ms ease;
+}
+
+.hover-habit {
+    display: none;
+}
+
+.habit-name {
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+.habit-column:hover > .habit-name {
+    color: rgba(255, 255, 255, 0.1);
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+.habit-column:hover > .hover-habit {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    grid-row-start: 1;
+    grid-column-start: 1;
 }
 
 .habits-tracker-header {

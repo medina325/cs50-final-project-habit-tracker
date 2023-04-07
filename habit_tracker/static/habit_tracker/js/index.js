@@ -39,7 +39,7 @@ function createHabitRow(habitName, parentDiv, newHabbitButton) {
     habitTrackingCircle.className = 'fixed-aspect-ratio-circle';
     habitTrackingCircle.dataset.habitName = habitName;
     habitTrackingCircle.dataset.trackingDate = trackingDate;
-    habitTrackingCircle.dataset.state = '';
+    habitTrackingCircle.dataset.state = 'notTracked';
 
     habitTrackingCircleContainer.appendChild(habitTrackingCircle);
     toggleTrackingOnClick(habitTrackingCircle);
@@ -52,9 +52,9 @@ function insertAfter(newElement, existingElement) {
   existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
 }
 
-function hideAndCleanModalForm() {
-  bootstrap.Modal.getInstance('#newHabitModal').hide();
-
+function hideAndCleanModalForm(modalId) {
+  bootstrap.Modal.getInstance(modalId).hide();
+  
   document.querySelector('#input-habit-name').value = '';
   document.querySelectorAll('.form-check-input').forEach((input) => {
     input.checked = false;
@@ -85,11 +85,17 @@ function createHabit() {
     })
   })
   .then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    return Promise.reject(response);
+  })
+  .then(response => {
     const newHabbitButton = document.getElementById('add-new-habit-button');
     newHabitRow = createHabitRow(habitName, newHabbitButton.parentNode, newHabbitButton)
-    hideAndCleanModalForm();
 
-    // Create small popup with the response message and a undo option
+    hideAndCleanModalForm('#newHabitModal');
+    fillUpToastAndShow(response.message, 'success');
   })
   .catch(err => {
     throw err;
@@ -97,6 +103,99 @@ function createHabit() {
     
   return false;
 }
+
+const scrollYears = el => {
+  el.onclick = () => {
+    let currentYearElement = document.querySelector('#habit-tracker-year');
+    const selectedYear = parseInt(currentYearElement.innerText);
+
+    if (el.dataset.yearScroll == 'next')
+      currentYearElement.innerHTML = selectedYear + 1;
+    else if (el.dataset.yearScroll == 'previous')
+      currentYearElement.innerHTML = selectedYear - 1;
+  }
+};
+
+const switchHabitTrackerMonthYear = el => {
+  el.onclick = () => {
+    let currentYearElement = document.querySelector('#habit-tracker-year');
+    const year = currentYearElement.innerText;
+    const month = el.dataset.month;
+    const baseURL = window.location.origin;
+    window.location.href = new URL(`${baseURL}/${year}/${month}`);
+  }
+};
+
+const readyEditHabitModal = el => {
+  el.onclick = () => {
+    const habitName = el.dataset.habit;
+    document.querySelector('#input-edit-habit-name').value = habitName;
+    document.querySelector('input[name=oldHabitName]').value = habitName;
+  }
+};
+
+function createToast(toastEl, elOptions) {
+  let options = elOptions || {
+    animation: true,
+    autohide: true,
+    delay: 5000
+  }
+
+  return new bootstrap.Toast(toastEl, options);
+}
+
+const fillUpToastAndShow = (message, toastRole, options) => {
+  document.querySelector(`#habit-toast-${toastRole}__message`).innerText = message;
+  let toastEl = document.querySelector(`#habit-toast-${toastRole}`);
+  let toaster = createToast(toastEl, options);
+
+  toaster.show();
+};
+
+function updateHabit() {
+  let trackingWeekdays = {}
+  document.querySelectorAll('.form-check-input').forEach(radio => {
+    trackingWeekdays[radio.value] = radio.checked;
+  })
+  
+  const newHabitName = document.querySelector('#input-edit-habit-name').value;
+  const oldHabitName = document.querySelector('input[name=oldHabitName]').value
+  
+  fetch('/update_habit', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value
+    },
+    mode: "same-origin",
+    body: JSON.stringify({
+      data: {
+        'old_name': oldHabitName,
+        'new_name': newHabitName,
+        'weekdays': trackingWeekdays,
+        'year': getCurrentHabitTrackerYear(),
+        'month': getCurrentHabitTrackerMonth()
+      }
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    return Promise.reject(response);
+  })
+  .then(response => {
+    hideAndCleanModalForm('#editHabitModal');
+    fillUpToastAndShow(response.message, 'success');
+  })
+  .catch(response => {
+    response.json().then(response => {
+      hideAndCleanModalForm('#editHabitModal');
+      fillUpToastAndShow(response.message, 'fail');
+    });
+  });
+
+  return false;
+};
 
 function toggleTrackingOnClick(el) {
   const stateMap = {
@@ -145,40 +244,28 @@ function toggleTrackingOnClick(el) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Initializing Tooltips
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   // Component 1 - Add tracking functionality for every "tracking unit"
   document.querySelectorAll('.fixed-aspect-ratio-circle[data-tracking-date]')
     .forEach(toggleTrackingOnClick);
 
   // Component 2 - Add new habit
-  document.querySelector('#new-habit-form').onsubmit = () => createHabit();
+  document.querySelector('#new-habit-submit-btn').onclick = createHabit;
 
   // Component 3 - Scroll through the years
-  document.querySelectorAll('.year-scroller').forEach(el => {
-    el.onclick = () => {
-      let currentYearElement = document.querySelector('#habit-tracker-year');
-      const selectedYear = parseInt(currentYearElement.innerText);
-
-      if (el.dataset.yearScroll == 'next')
-        currentYearElement.innerHTML = selectedYear + 1;
-      else if (el.dataset.yearScroll == 'previous')
-        currentYearElement.innerHTML = selectedYear - 1;
-    }
-  });
+  document.querySelectorAll('.year-scroller').forEach(scrollYears);
 
   // Component 4 - Pick a month/year for the habit tracker
-  document.querySelectorAll('.btn-month').forEach(el => {
-    el.onclick = () => {
-      let currentYearElement = document.querySelector('#habit-tracker-year');
-      const year = currentYearElement.innerText;
-      const month = el.dataset.month;
-      const baseURL = window.location.origin;
-      window.location.href = new URL(`${baseURL}/${year}/${month}`);
-    }
-  });
+  document.querySelectorAll('.btn-month').forEach(switchHabitTrackerMonthYear);
+
+  // Component 5 - Ready edit modal and actually edit habit
+  document.querySelectorAll('.edit-habit').forEach(readyEditHabitModal);
+  document.querySelector('#edit-habit-submit-btn').onclick = updateHabit;
+
+  // Component 6 - Delete habit
 
 
-  // Initializing Tooltips
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });
