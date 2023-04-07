@@ -62,7 +62,7 @@ def track_habit(request):
 
         tracked_date = date.fromisoformat(data['date'])
         if tracked_date.month != data['month']:
-            return JsonResponse({'error': 'date field\'s month should match month field'}, status=400)
+            return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
 
         habit = (
             request.user.habits
@@ -81,7 +81,7 @@ def track_habit(request):
 
         return JsonResponse({"message": f"Date {data['date']} tracked"}, status=201)
     
-    return JsonResponse({'error': 'Method should be POST'}, status=405)
+    return JsonResponse({'message': 'Method should be POST'}, status=405)
 
 @login_required
 @csrf_exempt
@@ -92,7 +92,7 @@ def untrack_habit(request):
 
         tracked_date = date.fromisoformat(data['date'])
         if tracked_date.month != data['month']:
-            return JsonResponse({'error': 'date field\'s month should match month field'}, status=400)
+            return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
 
         # TODO Find best way to validate if only one result is returned
         habit = (
@@ -112,7 +112,7 @@ def untrack_habit(request):
 
         return JsonResponse({"message": f"Habit {habit.name} untracked for date {data['date']}"}, status=200)
     
-    return JsonResponse({'error': 'Method should be POST'}, status=405)
+    return JsonResponse({'message': 'Method should be POST'}, status=405)
 
 @login_required
 def create_habit(request):
@@ -135,22 +135,43 @@ def create_habit(request):
             
         habit = Habit(user=request.user,
                       habit_tracker=habit_tracker,
-                      name=data['name'])
+                      name=data['name'],
+                      month=data['month'],
+                      year=data['year'])
         habit.save()
 
         return JsonResponse({'message': 'New habit added'}, status=201)
     
-    return JsonResponse({"error": "Method should be POST"}, status=405)
+    return JsonResponse({"message": "Method should be POST"}, status=405)
 
-def get_habit(request):
-    pass
-
-def get_habits(request):
-    pass
-
+@login_required
 def update_habit(request):
-    pass
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        # TODO Validate form
 
+        habit_data = {
+            'user': request.user,
+            'name': data['old_name'],
+            'month': data['month'],
+            'year': data['year']
+        }
+        
+        # Get record and update it
+        habit = Habit.objects.filter(**habit_data).first()
+
+        if not habit:
+            return JsonResponse({"message": "Habit not found"}, status=400)
+
+        habit.name = data['new_name']
+        # TODO Update tracking days
+        habit.save()
+
+        return JsonResponse({'message': 'Habit updated'}, status=200)
+
+    return JsonResponse({"message": "Method should be POST"}, status=405)
+    
+@login_required
 def delete_habit(request):
     # TODO Adicionar soft delete
     pass
