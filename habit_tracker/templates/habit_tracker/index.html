@@ -25,7 +25,7 @@
     {% else %}
       <a href="?week=1" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
     {% endif %}
-        <img src="{% static 'habit_tracker/images/icons/anchor-left-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+        <i class="bi bi-arrow-left"></i>
       </a>
     <div id="week-range">
       <div>
@@ -44,78 +44,70 @@
     {% else %}
       <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
     {% endif %}
-        <img src="{% static 'habit_tracker/images/icons/anchor-right-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
+        <i class="bi bi-arrow-right"></i>
       </a>
   </div>
 
-  <div id="habits-tracker-flex-container">
-    <div class="habits-tracker-grid-container">
-      <div id="habits-tracker-grid">
+  <div id="habits-tracker-grid">
 
-        {% with 'M T W T F S S' as weekdays %}
-          <div></div>
-          {% for day in weekdays.split %}
-            <div class="habits-tracker-header">{{ day }}</div>
-          {% endfor %}
-
-          {% for habit in habits %}
-            <div class="habit-column">
-              <div class="habit-name">
-                {{ habit.name }}
-              </div>
-              <div class="hover-habit">
-                <button type="button" class="btn btn-dark edit-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#editHabitModal">
-                  <i class="bi bi-pencil-square" style="font-size: 2rem; color: var(--color-background-dark-2);"></i>
-                </button>
-                <button type="button" class="btn btn-dark">
-                  <i class="bi bi-trash3" style="font-size: 2rem; color: red;"></i>
-                </button>
-              </div>
+    {% with 'M T W T F S S' as weekdays %}
+      <div></div>
+      {% for day in weekdays.split %}
+        <div class="habits-tracker-header">{{ day }}</div>
+      {% endfor %}
+      
+      {% for habit in habits %}
+          <form id="delete-{{ habit.id }}" action="{% url 'delete_habit' habit.id %}" method="post" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="redirect" value="{{ request.path }}">
+          </form>
+          <div class="habit-column">
+            <div class="habit-name" data-habit="{{ habit.name }}">
+              {{ habit.name }}
             </div>
-            {% for day in week %}
-              <div class="flex-circle-container">
-                <div class="fixed-aspect-ratio-circle {% if day.month != month %}disabled{% endif %}" data-habit-name="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
-              </div>
-            {% endfor %}
-          {% endfor %}
-
-          <div id="add-new-habit-button">
-            <button type="button" class="btn">
-              <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
-            </button>
+            <div class="hover-habit">
+              <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+                <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
+              </button>
+                <button form="delete-{{ habit.id }}" type="submit" class="btn btn-dark border" data-habit="{{ habit.id }}">
+                  <i class="bi bi-trash3" style="color: red;"></i>
+                </button>
+            </div>
           </div>
-          {% for _ in week %}
-            <div class="flex-circle-container">
-              <div class="fixed-aspect-ratio-circle disabled"></div>
+          {% for day in week %}
+            <div class="tracking-unit-container">
+              <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
             </div>
           {% endfor %}
-        {% endwith %}
+      {% endfor %}
 
+      <div id="add-new-habit-button">
+        <button type="button" class="btn">
+          <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
+        </button>
       </div>
-    </div>
-
-    <div id="check-stats-sidebar">
-      <div>
-        <img src="{% static 'habit_tracker/images/icons/anchor-right-arrow-caret-svgrepo-com.svg' %}" alt="Previous week">
-        <div>Check stats</div>
-      </div>
-    </div>
+      {% for _ in week %}
+        <div class="tracking-unit-container">
+          <div class="tracking-unit rounded-circle disabled"></div>
+        </div>
+      {% endfor %}
+    {% endwith %}
 
   </div>
 
   <!-- Modals -->
 
-  <div class="modal fade" id="editHabitModal" tabindex="-1" aria-labelledby="editHabitModalLabel" aria-hidden="true">
+  <div class="modal fade" id="updateHabitModal" tabindex="-1" aria-labelledby="updateHabitModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editHabitModalLabel">Edit your habit</h1>
+          <h1 class="modal-title fs-5" id="updateHabitModalLabel">Edit your habit</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         
         <div class="modal-body">
-          <form id="edit-habit-form">
+          <form id="update-habit-form">
             {% csrf_token %}
             <input type="hidden" value="{{ year }}" name="year">
             <input type="hidden" value="{{ month }}" name="month">
@@ -123,8 +115,8 @@
             <div class="row">
               
               <div class="col">
-                <label for="input-edit-habit-name" class="form-label">Habit name</label>
-                <input id="input-edit-habit-name" type="text" class="form-control" aria-label="Habit name" required>
+                <label for="input-update-habit-name" class="form-label">Habit name</label>
+                <input id="input-update-habit-name" type="text" class="form-control" aria-label="Habit name" required>
               </div>
               
               <div class="col">
@@ -150,7 +142,7 @@
         </div>
 
         <div class="modal-footer">
-          <button id="edit-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Save habit</button>
+          <button id="update-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Save habit</button>
         </div>
 
       </div>
@@ -280,8 +272,9 @@
     <div id="habit-toast-success" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body border border-2 border-success rounded">
         <div class="d-flex justify-content-center align-items-center gap-1">
+          <i class="bi bi-check-lg"></i>
           <span id="habit-toast-success__message"></span>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+          <!-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button> -->
         </div>
       </div>
     </div>
@@ -292,8 +285,8 @@
     <div id="habit-toast-fail" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body border border-2 border-danger rounded">
         <div class="d-flex justify-content-center align-items-center gap-1">
+          <i class="bi bi-x-lg"></i>
           <span id="habit-toast-fail__message"></span>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       </div>
     </div>
