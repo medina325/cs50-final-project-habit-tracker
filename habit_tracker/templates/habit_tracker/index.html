@@ -57,6 +57,7 @@
       {% endfor %}
       
       {% for habit in habits %}
+        <div class="habit-row">
           <form id="delete-{{ habit.id }}" action="{% url 'delete_habit' habit.id %}" method="post" style="display: none;">
             {% csrf_token %}
             <input type="hidden" name="redirect" value="{{ request.path }}">
@@ -79,6 +80,7 @@
               <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
             </div>
           {% endfor %}
+        </div>
       {% endfor %}
 
       <div id="add-new-habit-button">

@@ -59,6 +59,10 @@
     height: 70px;
 }
 
+.habit-row {
+    display: contents;
+}
+
 .habit-column {
     display: grid;
     grid-template-columns: 1fr;

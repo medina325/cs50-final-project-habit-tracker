@@ -23,38 +23,63 @@ function getTrackingDates() {
   return arr;
 };
 
-function createHabitRow(habitName, parentDiv, newHabbitButton) {
-  const currentMonth = getCurrentHabitTrackerMonth();
-
-  let newHabitNameCol = document.createElement('div');
-  
-  newHabitNameCol.className = 'habit-column';
-  newHabitNameCol.innerText = habitName;
-
-  parentDiv.insertBefore(newHabitNameCol, newHabbitButton);
-  const trackingDates = getTrackingDates();
-  trackingDates.reverse().forEach(trackingDate => {
-    let habitTrackingCircleContainer = document.createElement('div');
-    habitTrackingCircleContainer.className = 'tracking-unit-container';
-    
-    let habitTrackingCircle = document.createElement('div');
-    
-    const disabledClass = currentMonth != trackingDate.getUTCMonth() + 1 ? 'disabled': '';
-    habitTrackingCircle.className = `tracking-unit rounded-circle ${disabledClass}`;
-
-    habitTrackingCircle.dataset.habitName = habitName;
-    habitTrackingCircle.dataset.trackingDate = trackingDate.toISOString().slice(0, 10);
-    habitTrackingCircle.dataset.state = 'notTracked';
-
-    habitTrackingCircleContainer.appendChild(habitTrackingCircle);
-    toggleTrackingOnClick(habitTrackingCircle);
-    
-    insertAfter(habitTrackingCircleContainer, newHabitNameCol);
-  });
-}
-
 function insertAfter(newElement, existingElement) {
   existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
+}
+
+
+const createTrackingUnits = (habit) => {
+  const trackingDates = getTrackingDates();
+  const currentMonth = getCurrentHabitTrackerMonth();
+  let trackingUnits = '';
+
+  trackingDates.forEach(date => {
+    const disabledClass = currentMonth != date.getUTCMonth() + 1 ? 'disabled': '';
+    const isoDate = date.toISOString().slice(0, 10);
+
+    trackingUnits = `
+        ${trackingUnits}
+        <div class="tracking-unit-container">
+            <div class="tracking-unit rounded-circle ${disabledClass}" data-habit="${habit}" data-tracking-date="${isoDate}" data-state="notTracked"></div>
+        </div>
+    `;
+  });
+
+  return trackingUnits;
+};
+
+function createHabitRow(habitId, habitName) {
+  const csrf_token = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+  let habitRow = document.createElement('div');
+  habitRow.className = 'habit-row';
+  habitRow.innerHTML = `
+    <form id="delete-${habitId}" action="/delete_habit/${habitId}" method="post" style="display: none;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+      <input type="hidden" name="redirect" value="${window.location.pathname}">
+    </form>
+    <div class="habit-column">
+      <div class="habit-name" data-habit="${habitName}">
+        ${habitName}
+      </div>
+      <div class="hover-habit">
+        <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+          <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
+        </button>
+          <button form="delete-${habitId}" type="submit" class="btn btn-dark border" data-habit="${habitId}">
+            <i class="bi bi-trash3" style="color: red;"></i>
+          </button>
+      </div>
+    </div>
+    ${createTrackingUnits(habitName)}
+  `;
+
+  habitRow.querySelectorAll('.tracking-unit[data-tracking-date]')
+  .forEach(toggleTrackingOnClick);
+
+  habitRow.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
+
+  return habitRow;
 }
 
 function hideAndCleanModalForm(modalId) {
@@ -96,8 +121,13 @@ function createHabit() {
     return Promise.reject(response);
   })
   .then(response => {
-    const newHabbitButton = document.getElementById('add-new-habit-button');
-    newHabitRow = createHabitRow(habitName, newHabbitButton.parentNode, newHabbitButton)
+    const newHabitRow = createHabitRow(response.data.id, habitName);
+
+    const habitTracker = document.querySelector('#habits-tracker-grid')
+    habitTracker.appendChild(newHabitRow);
+
+    const lastRow = document.querySelector('#add-new-habit-button');
+    lastRow.parentNode.insertBefore(newHabitRow, lastRow)
 
     hideAndCleanModalForm('#newHabitModal');
     fillUpToastAndShow(response.message, 'success');
@@ -196,8 +226,11 @@ function updateHabit() {
     let editBtn = document.querySelector(`button[data-habit=${oldHabitName}`);
     editBtn.dataset.habit = newHabitName;
 
-    let trackingUnit = document.querySelector(`.tracking-unit[data-habit=${oldHabitName}]`);
-    trackingUnit.dataset.habit = newHabitName;
+    let trackingUnits = document.querySelectorAll(`.tracking-unit[data-habit=${oldHabitName}]`);
+    trackingUnits.forEach(el => {
+      el.dataset.habit = newHabitName;
+      toggleTrackingOnClick(el);
+    });
 
     hideAndCleanModalForm('#updateHabitModal');
     fillUpToastAndShow(response.message, 'success');
@@ -212,21 +245,21 @@ function updateHabit() {
   return false;
 };
 
-function toggleTrackingOnClick(el) {
-  const stateMap = {
-    tracked: {
-      url: '/untrack_habit',
-      toggleState: 'notTracked'
-    },
-    notTracked: {
-      url: '/track_habit',
-      toggleState: 'tracked'
-    }
-  };
-
-  const {url, toggleState} = stateMap[el.dataset.state]
-
+const toggleTrackingOnClick = el => {
   el.onclick = () => {
+    const stateMap = {
+      tracked: {
+        url: '/untrack_habit',
+        toggleState: 'notTracked'
+      },
+      notTracked: {
+        url: '/track_habit',
+        toggleState: 'tracked'
+      }
+    };
+  
+    const {url, toggleState} = stateMap[el.dataset.state]
+  
     fetch(url, {
       method: 'POST',
       mode: "same-origin",
@@ -243,7 +276,6 @@ function toggleTrackingOnClick(el) {
       if (response.ok) {
         return response.json();
       }
-
       return Promise.reject(response);
     })
     .then(() => {
@@ -256,7 +288,7 @@ function toggleTrackingOnClick(el) {
       })
     });
   };
-}
+};
 
 document.addEventListener('DOMContentLoaded', function() {
   // Initializing Tooltips
