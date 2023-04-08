@@ -16,7 +16,7 @@ function getTrackingDates() {
   for (var arr=[], dt=new Date(start); dt <= new Date(end); dt.setDate(dt.getDate()+1))
   {
     arr.push(
-      new Date(dt).toISOString().slice(0, 10)
+      new Date(dt)
     );
   }
 
@@ -24,8 +24,10 @@ function getTrackingDates() {
 };
 
 function createHabitRow(habitName, parentDiv, newHabbitButton) {
-  let newHabitNameCol = document.createElement('div');
+  const currentMonth = getCurrentHabitTrackerMonth();
 
+  let newHabitNameCol = document.createElement('div');
+  
   newHabitNameCol.className = 'habit-column';
   newHabitNameCol.innerText = habitName;
 
@@ -33,12 +35,15 @@ function createHabitRow(habitName, parentDiv, newHabbitButton) {
   const trackingDates = getTrackingDates();
   trackingDates.reverse().forEach(trackingDate => {
     let habitTrackingCircleContainer = document.createElement('div');
-    habitTrackingCircleContainer.className = 'flex-circle-container';
-
+    habitTrackingCircleContainer.className = 'tracking-unit-container';
+    
     let habitTrackingCircle = document.createElement('div');
-    habitTrackingCircle.className = 'fixed-aspect-ratio-circle';
+    
+    const disabledClass = currentMonth != trackingDate.getUTCMonth() + 1 ? 'disabled': '';
+    habitTrackingCircle.className = `tracking-unit rounded-circle ${disabledClass}`;
+
     habitTrackingCircle.dataset.habitName = habitName;
-    habitTrackingCircle.dataset.trackingDate = trackingDate;
+    habitTrackingCircle.dataset.trackingDate = trackingDate.toISOString().slice(0, 10);
     habitTrackingCircle.dataset.state = 'notTracked';
 
     habitTrackingCircleContainer.appendChild(habitTrackingCircle);
@@ -126,10 +131,10 @@ const switchHabitTrackerMonthYear = el => {
   }
 };
 
-const readyEditHabitModal = el => {
+const readyUpdateHabitModal = el => {
   el.onclick = () => {
     const habitName = el.dataset.habit;
-    document.querySelector('#input-edit-habit-name').value = habitName;
+    document.querySelector('#input-update-habit-name').value = habitName;
     document.querySelector('input[name=oldHabitName]').value = habitName;
   }
 };
@@ -158,8 +163,8 @@ function updateHabit() {
     trackingWeekdays[radio.value] = radio.checked;
   })
   
-  const newHabitName = document.querySelector('#input-edit-habit-name').value;
-  const oldHabitName = document.querySelector('input[name=oldHabitName]').value
+  const newHabitName = document.querySelector('#input-update-habit-name').value;
+  const oldHabitName = document.querySelector('input[name=oldHabitName]').value;
   
   fetch('/update_habit', {
     method: 'POST',
@@ -184,12 +189,22 @@ function updateHabit() {
     return Promise.reject(response);
   })
   .then(response => {
-    hideAndCleanModalForm('#editHabitModal');
+    let habitEl = document.querySelector(`.habit-name[data-habit=${oldHabitName}]`);
+    habitEl.dataset.habit = newHabitName;
+    habitEl.innerText = newHabitName;
+
+    let editBtn = document.querySelector(`button[data-habit=${oldHabitName}`);
+    editBtn.dataset.habit = newHabitName;
+
+    let trackingUnit = document.querySelector(`.tracking-unit[data-habit=${oldHabitName}]`);
+    trackingUnit.dataset.habit = newHabitName;
+
+    hideAndCleanModalForm('#updateHabitModal');
     fillUpToastAndShow(response.message, 'success');
   })
   .catch(response => {
     response.json().then(response => {
-      hideAndCleanModalForm('#editHabitModal');
+      hideAndCleanModalForm('#updateHabitModal');
       fillUpToastAndShow(response.message, 'fail');
     });
   });
@@ -217,7 +232,7 @@ function toggleTrackingOnClick(el) {
       mode: "same-origin",
       body: JSON.stringify({
         data: {
-          'name': el.dataset.habitName,
+          'name': el.dataset.habit,
           'year': getCurrentHabitTrackerYear(),
           'month': getCurrentHabitTrackerMonth(),
           'date': el.dataset.trackingDate,
@@ -249,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   // Component 1 - Add tracking functionality for every "tracking unit"
-  document.querySelectorAll('.fixed-aspect-ratio-circle[data-tracking-date]')
+  document.querySelectorAll('.tracking-unit[data-tracking-date]')
     .forEach(toggleTrackingOnClick);
 
   // Component 2 - Add new habit
@@ -262,10 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.btn-month').forEach(switchHabitTrackerMonthYear);
 
   // Component 5 - Ready edit modal and actually edit habit
-  document.querySelectorAll('.edit-habit').forEach(readyEditHabitModal);
-  document.querySelector('#edit-habit-submit-btn').onclick = updateHabit;
-
-  // Component 6 - Delete habit
-
-
+  document.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
+  document.querySelector('#update-habit-submit-btn').onclick = updateHabit;
 });
