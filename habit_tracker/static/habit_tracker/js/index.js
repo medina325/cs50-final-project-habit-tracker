@@ -132,8 +132,10 @@ function createHabit() {
     hideAndCleanModalForm('#newHabitModal');
     fillUpToastAndShow(response.message, 'success');
   })
-  .catch(err => {
-    throw err;
+  .catch(response => {
+    response.json().then(response => {
+      fillUpToastAndShow(response.message, 'fail');
+    });
   });
     
   return false;
@@ -237,7 +239,6 @@ function updateHabit() {
   })
   .catch(response => {
     response.json().then(response => {
-      hideAndCleanModalForm('#updateHabitModal');
       fillUpToastAndShow(response.message, 'fail');
     });
   });

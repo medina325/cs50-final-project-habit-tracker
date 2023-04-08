@@ -1,7 +1,7 @@
 import json
 from datetime import date
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import IntegrityError
@@ -35,6 +35,7 @@ def index(request, year=date.today().year, month=date.today().month):
     
     habits = [
         {
+            'id': habit.id,
             'name': habit.name,
             'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
         }
@@ -121,6 +122,7 @@ def create_habit(request):
 
         # TODO Validate form
         
+        # TODO use get_or_create
         habit_tracker_data = {
             'user': request.user,
             'month': data['month'],
@@ -135,46 +137,58 @@ def create_habit(request):
             
         habit = Habit(user=request.user,
                       habit_tracker=habit_tracker,
+                    #   **data)
                       name=data['name'],
                       month=data['month'],
                       year=data['year'])
-        habit.save()
+        try:
+            habit.save()
+        except IntegrityError:
+            return JsonResponse({'message': f"Habit {data['name']} already exists"}, status=400)
 
-        return JsonResponse({'message': 'New habit added'}, status=201)
+        return JsonResponse({'message': 'New habit added', 'data': {'id': habit.id}}, status=201)
     
     return JsonResponse({"message": "Method should be POST"}, status=405)
 
 @login_required
 def update_habit(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)['data']
-        # TODO Validate form
+    if not request.method == 'POST':
+        return JsonResponse({"message": "Method should be POST"}, status=405)
+    
+    data = json.loads(request.body)['data']
+    # TODO Validate form
 
-        habit_data = {
-            'user': request.user,
-            'name': data['old_name'],
-            'month': data['month'],
-            'year': data['year']
-        }
-        
-        # Get record and update it
-        habit = Habit.objects.filter(**habit_data).first()
+    habit_data = {
+        'user': request.user,
+        'name': data['old_name'],
+        'month': data['month'],
+        'year': data['year']
+    }
+    
+    # Get record and update it
+    habit = Habit.objects.filter(**habit_data).first()
 
-        if not habit:
-            return JsonResponse({"message": "Habit not found"}, status=400)
+    if not habit:
+        return JsonResponse({"message": "Habit not found"}, status=400)
 
+    # TODO Update tracking days
+    try:
         habit.name = data['new_name']
-        # TODO Update tracking days
         habit.save()
+    except IntegrityError:
+        return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
 
-        return JsonResponse({'message': 'Habit updated'}, status=200)
+    return JsonResponse({'message': 'Habit updated'}, status=200)
 
-    return JsonResponse({"message": "Method should be POST"}, status=405)
     
 @login_required
-def delete_habit(request):
-    # TODO Adicionar soft delete
-    pass
+def delete_habit(request, id):
+    if request.method == 'POST':
+        habit = get_object_or_404(Habit, id=id)
+        habit.delete()
+
+    return HttpResponseRedirect(request.POST.get('redirect'))
+
 # --------------------------------------------------------- users app ------------------------------------------------------------------------------------------------------
 
 def register(request):
