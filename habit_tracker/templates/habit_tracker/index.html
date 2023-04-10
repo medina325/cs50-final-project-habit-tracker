@@ -18,6 +18,22 @@
     <h1>Habit Tracker</h1>
   </div>
 
+  <div class="d-flex justify-content-end pe-3">
+    Welcome back, {{ user.first_name }}!
+  </div>
+
+  <div class="breadcrumbs-containers d-flex flex-row align-items-center gap-2 pl-2 pt-3">
+    <ol class="breadcrumb ms-3 mb-0">
+      <li class="breadcrumb-item">
+        <button type="button" class="btn p-0" data-bs-toggle="modal" data-bs-target="#calendarModal">
+          <i class="bi bi-calendar4-week" style="font-size: x-large;" data-bs-toggle="tooltip" data-bs-placement="auto" data-bs-title="Choose a year and a month for your calendar"></i>
+        </button>
+      </li>
+      <li class="breadcrumb-item">{{ year }}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ month | stringformat:"02d" }}</li>
+    </ol>
+  </div>
+
   <div id="week-display">
     <!-- Confuso? -->
     {% if week.has_previous %}
@@ -34,9 +50,7 @@
         <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
       </div>
       <div style="text-align: center;">
-        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#calendarModal">
-          <i class="bi bi-calendar4-week" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Choose a year and a month for your calendar"></i>
-        </button>
+        
       </div>
     </div>
     {% if week.has_next %}
@@ -276,7 +290,6 @@
         <div class="d-flex justify-content-center align-items-center gap-1">
           <i class="bi bi-check-lg"></i>
           <span id="habit-toast-success__message"></span>
-          <!-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button> -->
         </div>
       </div>
     </div>

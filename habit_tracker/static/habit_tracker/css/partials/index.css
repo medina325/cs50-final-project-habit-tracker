@@ -12,6 +12,11 @@
     background-color: var(--color-background-dark-3);
 }
 
+.breadcrumb-item {
+    align-self: center;
+    font-size: x-large;
+}
+
 #week-display {
     display: flex;
     margin-top: 2rem;
