@@ -1,6 +1,7 @@
 import json
 from datetime import date
 
+from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import IntegrityError
@@ -185,6 +186,7 @@ def delete_habit(request, id):
     if not request.method == 'POST':
         return JsonResponse({'message': f'Method should be POST'}, status=405)
 
+    # habit = get_object_or_404(Habit, id=id)
     habit = Habit.objects.get(id=id)
     if not habit:
         return JsonResponse({'message': f'Habit not found'}, status=404)
