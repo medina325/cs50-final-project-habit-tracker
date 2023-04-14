@@ -1,3 +1,23 @@
+@keyframes removerow {
+    0%, 50% {
+        grid-template-rows: 1fr;
+        margin-bottom: 10px;
+    }
+
+    50%, 100% {
+        opacity: 0;
+    }
+
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        grid-template-rows: 0;
+        margin-bottom: 0px;
+    }
+}
+
 /* Não faço ideia de como descrever */
 #month-week-title {
     text-align: center;
@@ -48,6 +68,12 @@
     border: 1px solid var(--color-background-dark-3);
 } */
 
+#new-habit-button {
+    cursor: pointer;
+    width: 70px;
+    height: 70px;
+}
+
 /* Habit tracker's grid */
 #habits-tracker-grid {
     margin-top: 1rem;
@@ -58,14 +84,15 @@
     vertical-align: middle;
 }
 
-#new-habit-button {
-    cursor: pointer;
-    width: 70px;
-    height: 70px;
-}
-
-.habit-row {
-    display: contents;
+.habit-tracker-row {
+    display: grid;
+    grid-template-columns: 2fr repeat(7, 1fr);
+    text-align: center;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    animation-play-state: paused;
+    animation-name: removerow;
+    animation-duration: 1.0s;
 }
 
 .habit-column {
@@ -172,4 +199,13 @@
 
 #months-container {
     padding: 1rem;
+}
+
+button:has(i.bi-calendar2-plus) {
+    font-size: 2.5rem;
+    transition: font-size 0.2s;
+}
+
+button:has(i.bi-calendar2-plus):hover {
+    font-size: 3rem;
 }

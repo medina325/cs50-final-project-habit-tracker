@@ -8,6 +8,10 @@ function getCurrentHabitTrackerMonth() {
   return parseInt(document.querySelector('[name=month]').value);
 }
 
+const getCSRFToken = () => {
+  return document.querySelector('input[name=csrfmiddlewaretoken]').value;
+}
+
 function getTrackingDates() {
   const [start, end] = [
     ...document.querySelectorAll('span[data-date]')
@@ -49,15 +53,10 @@ const createTrackingUnits = (habit) => {
 };
 
 function createHabitRow(habitId, habitName) {
-  const csrf_token = document.querySelector('input[name=csrfmiddlewaretoken]').value;
-
   let habitRow = document.createElement('div');
-  habitRow.className = 'habit-row';
+  habitRow.className = 'habit-tracker-row';
+  habitRow.dataset.habitId = habitId;
   habitRow.innerHTML = `
-    <form id="delete-${habitId}" action="/delete_habit/${habitId}" method="post" style="display: none;">
-      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-      <input type="hidden" name="redirect" value="${window.location.pathname}">
-    </form>
     <div class="habit-column">
       <div class="habit-name" data-habit="${habitName}">
         ${habitName}
@@ -66,7 +65,7 @@ function createHabitRow(habitId, habitName) {
         <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
           <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
         </button>
-          <button form="delete-${habitId}" type="submit" class="btn btn-dark border" data-habit="${habitId}">
+          <button type="submit" class="btn btn-dark border" data-role="delete-habit" data-habit="${habitId}">
             <i class="bi bi-trash3" style="color: red;"></i>
           </button>
       </div>
@@ -76,8 +75,8 @@ function createHabitRow(habitId, habitName) {
 
   habitRow.querySelectorAll('.tracking-unit[data-tracking-date]')
   .forEach(toggleTrackingOnClick);
-
   habitRow.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
+  habitRow.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
 
   return habitRow;
 }
@@ -102,7 +101,7 @@ function createHabit() {
   fetch('/create_habit', {
     method: 'POST',
     headers: {
-      'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value
+      'X-CSRFToken': getCSRFToken()
     },
     mode: "same-origin",
     body: JSON.stringify({
@@ -123,11 +122,11 @@ function createHabit() {
   .then(response => {
     const newHabitRow = createHabitRow(response.data.id, habitName);
 
-    const habitTracker = document.querySelector('#habits-tracker-grid')
-    habitTracker.appendChild(newHabitRow);
+    const habitTracker = document.querySelector('#container')
 
-    const lastRow = document.querySelector('#add-new-habit-button');
-    lastRow.parentNode.insertBefore(newHabitRow, lastRow)
+    const habitRows = document.querySelectorAll('.habit-tracker-row');
+    const lastRow = habitRows[habitRows.length - 1];
+    habitTracker.insertBefore(newHabitRow, lastRow);
 
     hideAndCleanModalForm('#newHabitModal');
     fillUpToastAndShow(response.message, 'success');
@@ -201,7 +200,7 @@ function updateHabit() {
   fetch('/update_habit', {
     method: 'POST',
     headers: {
-      'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value
+      'X-CSRFToken': getCSRFToken()
     },
     mode: "same-origin",
     body: JSON.stringify({
@@ -291,6 +290,42 @@ const toggleTrackingOnClick = el => {
   };
 };
 
+const deleteHabitWithUndoOption = el => {
+  el.onclick = () => {
+    const habitId = el.dataset.habit;
+    fetch(`/delete_habit/${habitId}`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken()
+      },
+      mode: "same-origin"
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      return Promise.reject(response);
+    })
+    .then(response => {
+      const habitRow = document.querySelector(`.habit-tracker-row[data-habit-id="${habitId}"]`);
+      habitRow.style.animationPlayState = 'running';
+      habitRow.addEventListener('animationend', () => {
+        document.querySelector('#habit-toast-undo-delete__message').innerText = response.message;
+        const toastEl = document.querySelector('#habit-toast-undo-delete');
+        const toaster = new bootstrap.Toast(toastEl);
+        toaster.show();
+  
+        habitRow.remove();
+      });
+    })
+    .catch(response => {
+      response.json().then(response => {
+        fillUpToastAndShow(response.message, 'fail');
+      });
+    });
+  };
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   // Initializing Tooltips
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -312,4 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Component 5 - Ready edit modal and actually edit habit
   document.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
   document.querySelector('#update-habit-submit-btn').onclick = updateHabit;
+
+  // Component 6 - Delete habit
+  document.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
 });

@@ -62,44 +62,45 @@
       </a>
   </div>
 
-  <div id="habits-tracker-grid">
+  <div id="container">
 
     {% with 'M T W T F S S' as weekdays %}
-      <div></div>
-      {% for day in weekdays.split %}
-        <div class="habits-tracker-header">{{ day }}</div>
-      {% endfor %}
+      <div class="habit-tracker-row">
+        <div></div>
+        {% for day in weekdays.split %}
+          <div class="habits-tracker-header">{{ day }}</div>
+        {% endfor %}
+      </div>
+    {% endwith %}
       
-      {% for habit in habits %}
-        <div class="habit-row">
-          <form id="delete-{{ habit.id }}" action="{% url 'delete_habit' habit.id %}" method="post" style="display: none;">
-            {% csrf_token %}
-            <input type="hidden" name="redirect" value="{{ request.path }}">
-          </form>
-          <div class="habit-column">
-            <div class="habit-name" data-habit="{{ habit.name }}">
-              {{ habit.name }}
-            </div>
-            <div class="hover-habit">
-              <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-                <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
-              </button>
-                <button form="delete-{{ habit.id }}" type="submit" class="btn btn-dark border" data-habit="{{ habit.id }}">
-                  <i class="bi bi-trash3" style="color: red;"></i>
-                </button>
-            </div>
+    {% for habit in habits %}
+      <div class="habit-tracker-row" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}">
+        <div class="habit-column">
+          <div class="habit-name" data-habit="{{ habit.name }}">
+            {{ habit.name }}
           </div>
-          {% for day in week %}
-            <div class="tracking-unit-container">
-              <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
-            </div>
-          {% endfor %}
+          <div class="hover-habit">
+            <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+              <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
+            </button>
+              <button type="button" class="btn btn-dark border" data-role="delete-habit" data-habit="{{ habit.id }}">
+                <i class="bi bi-trash3" style="color: red;"></i>
+              </button>
+          </div>
         </div>
-      {% endfor %}
+        {% for day in week %}
+          <div class="tracking-unit-container">
+            <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
 
+    <div class="habit-tracker-row">
       <div id="add-new-habit-button">
         <button type="button" class="btn">
-          <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
+          <!-- <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i> -->
+          <i class="bi bi-calendar2-plus" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
         </button>
       </div>
       {% for _ in week %}
@@ -107,7 +108,7 @@
           <div class="tracking-unit rounded-circle disabled"></div>
         </div>
       {% endfor %}
-    {% endwith %}
+    </div>
 
   </div>
 
@@ -284,7 +285,7 @@
 
   <!-- Toasts -->
   <!-- Success Toast -->
-  <div class="toast-container position-absolute p-3 bottom-0 start-50" id="toastPlacement">
+  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
     <div id="habit-toast-success" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body border border-2 border-success rounded">
         <div class="d-flex justify-content-center align-items-center gap-1">
@@ -296,13 +297,33 @@
   </div>
 
   <!-- Fail Toast -->
-  <div class="toast-container position-absolute p-3 bottom-0 start-50" id="toastPlacement">
+  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
     <div id="habit-toast-fail" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body border border-2 border-danger rounded text-red">
         <div class="d-flex justify-content-center align-items-center gap-1">
           <i class="bi bi-x-lg"></i>
           <span id="habit-toast-fail__message"></span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undo delete Toast -->
+  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
+    <div id="habit-toast-undo-delete" class="toast text-white bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body border border-2 border-danger rounded text-red">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="toast-body__message">
+            <i class="bi bi-trash3" style="color: red;"></i>
+            <span id="habit-toast-undo-delete__message">Habit deleted</span>
+          </div>
+          <div class="d-flex justify-content-end align-items-center gap-2">
+            <button class="btn btn-outline-light" data-role="undo-delete" type="button">Undo</button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
