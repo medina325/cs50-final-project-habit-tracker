@@ -241,9 +241,12 @@ def login_view(request):
         return render(request, 'habit_tracker/login.html', {
             'message': 'Invalid credentials. Username/E-mail or password incorrect'
         }, status=401)
-        
-    return render(request, 'habit_tracker/login.html', status=200)
+    
+    if not request.user.is_authenticated:
+        return render(request, 'habit_tracker/login.html', status=200)
 
+    return HttpResponseRedirect(reverse('index'))
+    
 def logout_view(request):
     logout(request)
     
