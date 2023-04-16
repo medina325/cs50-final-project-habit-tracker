@@ -1,37 +1,123 @@
 :root{
     /* Os "--" se referem a criação de variáveis em CSS, que podem ser usadas com var(nome_variavel)*/
 
-    --color-background: #e6e6e6;
-    --color-primary:#2a2a2a;
-
-    --color-background-dark-1: #1d1d1d;
-    --color-background-dark-2: #7855ca;
-    --color-background-dark-3: #31015c;
-    --color-background-dark-4: #18022b;
-    --color-primary-dark: #D4C2FF;
+    --color-primary: #f6f6f6;
+    --color-secondary: #031a8b;
+    --body-bg: #0d102d;
+    --body-bg-contrast: white;
+    --nav-bg: #e7e6f7;
+    --btn-bg: #2e42a7;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #14257b;
+    --btn-active-bg: #0e1a54;
+    --btn-focus-bg: #0e1a54;
+    --btn-disabled-bg: #3a3c5e;
+    --tracking-unit-border: #aebbff;
+    --tracking-unit-fill: #23e7f3;
 }
 
-* {
+:root:has(#light:checked) {
+    --color-primary: #2c2c2c;
+    --color-secondary: #3e038b;
+    --body-bg: #ededed;
+    --body-bg-contrast: rgb(52, 52, 52);
+    --nav-bg: #383838;
+    --btn-bg: #602ea7;
+    --btn-bg-contrast: rgb(61, 61, 61);
+    --btn-hover-bg: #36147b;
+    --btn-active-bg: #240e54;
+    --btn-focus-bg: #240e54;
+    --btn-disabled-bg: #443a5e;
+    --tracking-unit-border: #ccaeff;
+    --tracking-unit-fill: #6823f3;
+}
+
+:root:has(#purple:checked), .purple {
+    --color-secondary: #7855ca;
+    --body-bg: #1a0d2d;
+    --body-bg-contrast: white;
+    --nav-bg: #bbb6ff;
+    --btn-bg: #7855ca;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #6648ac;
+    --btn-active-bg: #522a8e;
+    --btn-focus-bg: #522a8e;
+    --btn-disabled-bg: #664b8f;
+    --tracking-unit-border: #d2aeff;
+    --tracking-unit-fill: #9542f3;
+}
+
+:root:has(#blue:checked), .blue {
+    --color-primary: #f6f6f6;
+    --color-secondary: #031a8b;
+    --body-bg: #0d102d;
+    --body-bg-contrast: white;
+    --nav-bg: #e7e6f7;
+    --btn-bg: #2e42a7;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #14257b;
+    --btn-active-bg: #0e1a54;
+    --btn-focus-bg: #0e1a54;
+    --btn-disabled-bg: #3a3c5e;
+    --tracking-unit-border: #aebbff;
+    --tracking-unit-fill: #23e7f3;
+}
+
+:root:has(#pink:checked), .pink {
+    --color-secondary: #7d038b;
+    --body-bg: #280d2d;
+    --body-bg-contrast: white;
+    --nav-bg: #f7b6ff;
+    --btn-bg: #d06be5;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #663470;
+    --btn-active-bg: #663470;
+    --btn-focus-bg: #663470;
+    --btn-disabled-bg: #4e4151;
+    --tracking-unit-border: #feaeff;
+    --tracking-unit-fill: #dd57c2;
+}
+
+:root:has(#green:checked), .green {
+    --color-secondary: #20c807;
+    --body-bg: #010e01;
+    --body-bg-contrast: white;
+    --nav-bg: #baffb6;
+    --btn-bg: #6dcd76;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #34703e;
+    --btn-active-bg: #347039;
+    --btn-focus-bg: #347039;
+    --btn-disabled-bg: #415147;
+    --tracking-unit-border: #aeffc2;
+    --tracking-unit-fill: #5cdd57;
+}
+
+:root:has(#orange:checked), .orange {
+    --color-secondary: #8b3003;
+    --body-bg: #120801;
+    --body-bg-contrast: white;
+    --nav-bg: #ffd4b6;
+    --btn-bg: #dd6921;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #6e3313;
+    --btn-active-bg: #763717;
+    --btn-focus-bg: #763717;
+    --btn-disabled-bg: #514941;
+    --tracking-unit-border: #ffcdae;
+    --tracking-unit-fill: #df701b;
+}
+
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: var(--color-primary-dark);
-}
-
-html, body {
-    height: 100vh;
 }
 
 body {
-    background-color: var(--color-background-dark-1);
+    background-color: var(--body-bg);
     font-size: 1rem;
-}
-
-#layout-container {
-    width: 100vw;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    color: var(--color-primary);
 }
 
 main {
@@ -41,32 +127,104 @@ main {
     flex-direction: column;
 }
 
-.bg-dark-1 {    
-    background-color: var(--color-background-dark-1);
+i, .icon {
+    fill: var(--color-primary);
+    color: var(--color-primary);
 }
 
-.bg-dark-2 {    
-    background-color: var(--color-background-dark-2);
+.icon-contrast {
+    fill: var(--color-secondary);
+    color: var(--color-secondary);
 }
 
-.bg-dark-3 {    
-    background-color: var(--color-background-dark-3);
-}
-
-.bg-dark-4 {    
-    background-color: var(--color-background-dark-4);
+#layout-container {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .vr {
-    background-color: var(--color-background-dark-3);
+    background-color: var(--color-bg-dark-3);
 }
 
-.light {
-    fill: var(--color-background-dark-3);
-    color: var(--color-background-dark-3);
+.btn-action {
+    color: var(--color-primary);
+    background-color: var(--btn-bg);
 }
 
-.dark {
-    fill: var(--color-background-3);
-    color: var(--color-background-3);
+.btn-action:hover {
+    background-color: var(--btn-hover-bg);
+}
+
+.btn-action:active {
+    background-color: var(--btn-active-bg) !important;
+}
+
+.btn-action:disabled, .btn-action.disabled {
+    background-color: var(--btn-disabled-bg) !important;
+}
+
+.btn-action-contrast {
+    color: var(--color-secondary);
+    background-color: var(--btn-bg-contrast);
+}
+
+.btn-action-contrast:hover {
+    background-color: var(--btn-hover-bg);
+}
+
+.btn-action-contrast:active {
+    background-color: var(--btn-active-bg) !important;
+}
+
+.btn-action-contrast:disabled, .btn-action-contrast.disabled {
+    background-color: var(--btn-disabled-bg) !important;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    background-color: var(--btn-active-bg);
+}
+
+.color-picker li {
+    padding-top: 0.75rem;
+}
+
+.color-picker {
+    text-align: center;
+    min-width: auto;
+    border: 1px solid var(--tracking-unit-border);
+}
+
+.color-picker input[type="radio"] {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    outline: 3px solid var(--radio-color, currentColor);
+    outline-offset: 3px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.color-picker input[type="radio"]:checked {
+    background-color: var(--radio-color);
+}
+
+.color-picker input[type="radio"]#light {
+    --radio-color: gray;
+}
+.color-picker input[type="radio"]#purple {
+    --radio-color: #7855ca;
+}
+.color-picker input[type="radio"]#blue {
+    --radio-color: #2e42a7;
+}
+.color-picker input[type="radio"]#pink {
+    --radio-color: #d06be5;
+}
+.color-picker input[type="radio"]#green {
+    --radio-color: #20c807;
+}
+.color-picker input[type="radio"]#orange {
+    --radio-color: #dd6921;
 }

@@ -18,6 +18,18 @@
     }
 }
 
+@keyframes tracking {
+    0%, 100% {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    50% {
+        width: 2.7rem;
+        height: 2.7rem;
+    }
+}
+
 /* Não faço ideia de como descrever */
 #month-week-title {
     text-align: center;
@@ -29,7 +41,7 @@
     padding: 10px 15px 10px 15px;
     border-radius: 10px;
     font-size: 30px;
-    background-color: var(--color-background-dark-3);
+    background-color: var(--body-bg);
 }
 
 .breadcrumb-item {
@@ -53,7 +65,6 @@
 /* .habits-tracker-grid-container {
     flex-basis: 0;
     flex-grow: 999;
-    border: 1px solid var(--color-background-dark-2);
 } */
 
 /* #check-stats-sidebar {
@@ -65,7 +76,6 @@
     justify-content: center;
     align-items: center;
     
-    border: 1px solid var(--color-background-dark-3);
 } */
 
 #new-habit-button {
@@ -100,7 +110,7 @@
     grid-template-columns: 1fr;
     margin: auto;
     
-    background-color: var(--color-background-dark-3);
+    background-color: var(--btn-bg);
     padding-inline: 15px;
     min-width: -webkit-fill-available;
     border-radius: 25px;
@@ -109,7 +119,7 @@
 
 .habit-column:hover {
     cursor: pointer;
-    background-color: var(--color-background-dark-4);
+    background-color: var(--btn-hover-bg);
     transition: all 500ms ease;
 }
 
@@ -143,7 +153,7 @@
 }
 
 [data-state="tracked"] {
-    background-color: var(--color-background-dark-2);
+    background-color: var(--tracking-unit-fill);
 }
 
 /* Fixed aspect ratio circle trick */
@@ -156,24 +166,34 @@
 .tracking-unit {
     width: 3rem;
     height: 3rem;
-    border: 2px solid var(--color-background-dark-2);
+    border: 2px solid var(--tracking-unit-border);
     
     cursor: pointer;
 }
 
+.tracking-unit-animation {
+    animation-name: tracking;
+    animation-duration: 150ms;
+}
+
 /* New habit modal */
 .modal {
-    --bs-modal-bg: var(--color-background-dark-1);
+    --bs-modal-bg: var(--body-bg);
 }
 
 .modal-header {
-    background-color: var(--color-background-dark-2);
+    color: var(--color-secondary);
+    background-color: var(--body-bg-contrast) !important;
 }
 
 .disabled {
     opacity: 0.3;
     cursor: pointer;
     pointer-events: none;
+}
+
+#new-habit-submit-btn, #update-habit-submit-btn {
+    font-weight: 600;
 }
 
 /* Year month picker */
@@ -208,4 +228,9 @@ button:has(i.bi-calendar2-plus) {
 
 button:has(i.bi-calendar2-plus):hover {
     font-size: 3rem;
+}
+
+#habit-toast-success .toast-body {
+    border: 2px solid var(--color-secondary);
+
 }
