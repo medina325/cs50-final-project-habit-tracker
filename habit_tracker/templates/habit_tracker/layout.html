@@ -17,6 +17,7 @@
   {% block css %}
   {% endblock %}
 
+  <script src="{% static 'habit_tracker/js/themes.js' %}"></script>
   {% block js %}
   {% endblock %}
 
@@ -38,19 +39,63 @@
 
             <div class="dropdown">
               <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle"></i>
+                <i class="bi bi-palette-fill icon-contrast"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-dark">
+              <ul class="color-picker dropdown-menu">
+                <li>
+                  <div class="dropdown-item">
+                    <label for="light" class="visually-hidden">Light</label>
+                    <input type="radio" name="theme" id="light">
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-item">
+                    <label for="purple" class="visually-hidden">Purple</label>
+                    <input type="radio" name="theme" id="purple" >
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-item">
+                    <label for="blue" class="visually-hidden">Blue theme</label>
+                    <input type="radio" id="blue" name="theme">
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-item">
+                    <label for="pink" class="visually-hidden">Pink theme</label>
+                    <input type="radio" id="pink" name="theme">
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-item">
+                    <label for="green" class="visually-hidden">Green theme</label>
+                    <input type="radio" id="green" name="theme">
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-item">
+                    <label for="orange" class="visually-hidden">Orange theme</label>
+                    <input type="radio" id="orange" name="theme" checked>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle icon-contrast"></i>
+              </button>
+              <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="#">
-                    <i class="bi bi-person-circle"></i>
+                    <i class="bi bi-person-circle icon-contrast"></i>
                     <span>Your profile</span>
                   </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                   <a class="dropdown-item" href="{% url 'logout' %}">
-                    <i class="bi bi-box-arrow-right"></i>
+                    <i class="bi bi-box-arrow-right icon-contrast"></i>
                     <span>Logout</span>
                   </a>
                 </li>
