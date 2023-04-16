@@ -16,90 +16,82 @@
 {% block body %}
 
   <div id="login-flex-container">
-    <div class="d-flex justify-content-center align-items-center bg-dark-4">
-      <img class="sample_screenshot" src="{% static 'habit_tracker/images/sample3.jpg' %}" alt="Sample screenshot">
-    </div>
     <div class="d-flex justify-content-center align-items-center py-5 w-75">
-
-        <div class="card text-center" style="min-width: 50%;">
-  
-          <div class="login-nav py-3">
-            <a id="sign-in-toggle" href="#" data-toggle="sign-in-form" autofocus>Sign In</a>
-            <div class="vr"></div>
-            <a id="register-toggle" href="#" data-toggle="register-form">Register</a>
-          </div>
-  
-          <hr style="margin: 0;">
-
-          <h1>{{ message }}</h1>
-  
-          <div class="card-body">
-            
-            <form action="{% url 'login' %}" method="POST" id="sign-in-form" class="active">
-              {% csrf_token %}
-              <div class="row mb-4">
-                <div class="col input-group">
-                  <span class="input-group-text" id="user-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-person-fill light" viewBox="0 0 16 16">
-                      <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-                    </svg>
-                  </span>
-                  <input class="form-control" type="text" name="username" placeholder="Username or E-mail" aria-label="Username" aria-describedby="user-icon">
-                </div>
-              </div>
-              <div class="row mb-4">
-                <div class="col input-group">
-                  <span class="input-group-text" id="password-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-key-fill light" viewBox="0 0 16 16">
-                      <path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2zM2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                    </svg>
-                  </span>
-                  <input type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="password-icon">
-                </div>
-              </div>
-              <div class="d-grid">
-                <button type="submit" class="btn btn-success">Sign In</button>
-              </div>
-            </form>
-  
-            <form action="{% url 'register' %}" method="POST" id="register-form" class="inactive">
-              {% csrf_token %}
-              <div class="row mb-4">
-                <div class="col-6">
-                  <input class="form-control" type="text" name="first_name" placeholder="First name">
-                </div>
-                <div class="col-6">
-                  <input class="form-control" type="text" name="last_name" placeholder="Last name">
-                </div>
-              </div>
-              <div class="row mb-4">
-                <div class="col">
-                  <input class="form-control" type="email" name="email" placeholder="E-mail">
-                </div>
-              </div>
-              <div class="row mb-4">
-                <div class="col">
-                  <input class="form-control" type="text" name="username" placeholder="Username">
-                </div>
-              </div>
-              <div class="row mb-4">
-                <div class="col-6">
-                  <input type="password" class="form-control" name="password" placeholder="Password">
-                </div>
-                <div class="col-6">
-                  <input type="password" class="form-control" name="confirmation" placeholder="Confirm password">
-                </div>
-              </div>
-              <div class="d-grid">
-                <button type="submit" class="btn btn-success">Register</button>
-              </div>
-            </form>
-  
-          </div>
+      <div class="card text-center" style="max-width: 30rem;">
+        <div class="login-nav py-3">
+          <a id="sign-in-toggle" href="#" data-toggle="sign-in-form" autofocus>Sign In</a>
+          <div class="vr"></div>
+          <a id="register-toggle" href="#" data-toggle="register-form">Register</a>
         </div>
+        <hr style="margin: 0;">
+        <div class="card-body">
+          <h6 class="backend-message">{{ message }}</h6>
+          <form action="{% url 'login' %}" method="POST" id="sign-in-form" class="active">
+            {% csrf_token %}
+            <div class="row mb-4">
+              <div class="col input-group">
+                <span class="input-group-text" id="user-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-person-fill icon-contrast" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                  </svg>
+                </span>
+                <input class="form-control" type="text" name="username" placeholder="Username or E-mail" aria-label="Username" aria-describedby="user-icon">
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col input-group">
+                <span class="input-group-text" id="password-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-key-fill icon-contrast" viewBox="0 0 16 16">
+                    <path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2zM2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                  </svg>
+                </span>
+                <input type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="password-icon">
+              </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-action">Sign In</button>
+            </div>
+          </form>
 
+          <form action="{% url 'register' %}" method="POST" id="register-form" class="inactive">
+            {% csrf_token %}
+            <div class="row mb-4">
+              <div class="col-6">
+                <input class="form-control" type="text" name="first_name" placeholder="First name">
+              </div>
+              <div class="col-6">
+                <input class="form-control" type="text" name="last_name" placeholder="Last name">
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col">
+                <input class="form-control" type="email" name="email" placeholder="E-mail">
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col">
+                <input class="form-control" type="text" name="username" placeholder="Username">
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col-6">
+                <input type="password" class="form-control" name="password" placeholder="Password">
+              </div>
+              <div class="col-6">
+                <input type="password" class="form-control" name="confirmation" placeholder="Confirm password">
+              </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-action">Register</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
     </div>
-
+    <div class="d-flex justify-content-center align-items-center">
+      <img class="sample-screenshot" src="{% static 'habit_tracker/images/sample.jpg' %}" alt="Sample screenshot">
+    </div>
   </div>
 
 {% endblock %}

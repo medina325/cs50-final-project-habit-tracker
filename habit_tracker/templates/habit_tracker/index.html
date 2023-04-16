@@ -37,9 +37,9 @@
   <div id="week-display">
     <!-- Confuso? -->
     {% if week.has_previous %}
-      <a href="?week={{ week.previous_page_number }}" class="week-scroller btn btn-success">
+      <a href="?week={{ week.previous_page_number }}" class="week-scroller btn btn-action">
     {% else %}
-      <a href="?week=1" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
+      <a href="?week=1" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
     {% endif %}
         <i class="bi bi-arrow-left"></i>
       </a>
@@ -54,9 +54,9 @@
       </div>
     </div>
     {% if week.has_next %}
-      <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-success">
+      <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-action">
     {% else %}
-      <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-success disabled" tabindex="-1" aria-disabled="true">
+      <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
     {% endif %}
         <i class="bi bi-arrow-right"></i>
       </a>
@@ -80,11 +80,11 @@
             {{ habit.name }}
           </div>
           <div class="hover-habit">
-            <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-              <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
+            <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+              <i class="bi bi-pencil-square icon-contrast"></i>
             </button>
-              <button type="button" class="btn btn-dark border" data-role="delete-habit" data-habit="{{ habit.id }}">
-                <i class="bi bi-trash3" style="color: red;"></i>
+              <button type="button" class="btn btn-light border" data-role="delete-habit" data-habit="{{ habit.id }}">
+                <i class="bi bi-trash3 text-danger"></i>
               </button>
           </div>
         </div>
@@ -159,7 +159,7 @@
         </div>
 
         <div class="modal-footer">
-          <button id="update-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Save habit</button>
+          <button id="update-habit-submit-btn" type="button" class="btn btn-action-contrast" autocomplete="off">Save habit</button>
         </div>
 
       </div>
@@ -210,7 +210,7 @@
         </div>
 
         <div class="modal-footer">
-          <button id="new-habit-submit-btn" type="button" class="btn btn-success" autocomplete="off">Create new habit</button>
+          <button id="new-habit-submit-btn" type="button" class="btn btn-action-contrast" autocomplete="off">Create new habit</button>
         </div>
 
       </div>
@@ -219,62 +219,62 @@
 
   <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
-      <div class="modal-content">
+      <div class="modal-content border">
         <div class="modal-body">
           <div id="year-container">
-            <button class="year-scroller btn btn-success" data-year-scroll="previous">
+            <button class="year-scroller btn btn-action" data-year-scroll="previous">
               <i class="bi bi-arrow-left" style="font-size: 1rem; color: white;"></i>
             </button>
             <div id="habit-tracker-year">
               {{ year }}
             </div>
-            <button class="year-scroller btn btn-success" data-year-scroll="next">
+            <button class="year-scroller btn btn-action" data-year-scroll="next">
               <i class="bi bi-arrow-right" style="font-size: 1rem; color: white;"></i>
             </button>
           </div>
           <div id="months-container">
             <div class="row mb-3 gx-3">
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="1">Jan</button>
+                <button class="btn btn-action btn-month" data-month="1">Jan</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="2">Feb</button>
+                <button class="btn btn-action btn-month" data-month="2">Feb</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="3">Mar</button>
-              </div>
-            </div>
-            <div class="row mb-3 gx-3">
-              <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="4">Apr</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="5">May</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="6">Jun</button>
+                <button class="btn btn-action btn-month" data-month="3">Mar</button>
               </div>
             </div>
             <div class="row mb-3 gx-3">
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="7">Jul</button>
+                <button class="btn btn-action btn-month" data-month="4">Apr</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="8">Aug</button>
+                <button class="btn btn-action btn-month" data-month="5">May</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="9">Sep</button>
+                <button class="btn btn-action btn-month" data-month="6">Jun</button>
               </div>
             </div>
             <div class="row mb-3 gx-3">
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="10">Oct</button>
+                <button class="btn btn-action btn-month" data-month="7">Jul</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="11">Nov</button>
+                <button class="btn btn-action btn-month" data-month="8">Aug</button>
               </div>
               <div class="col-4">
-                <button class="btn btn-success btn-month" data-month="12">Dec</button>
+                <button class="btn btn-action btn-month" data-month="9">Sep</button>
+              </div>
+            </div>
+            <div class="row mb-3 gx-3">
+              <div class="col-4">
+                <button class="btn btn-action btn-month" data-month="10">Oct</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-action btn-month" data-month="11">Nov</button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-action btn-month" data-month="12">Dec</button>
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@
   <!-- Success Toast -->
   <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
     <div id="habit-toast-success" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-body border border-2 border-success rounded">
+      <div class="toast-body  rounded">
         <div class="d-flex justify-content-center align-items-center gap-1">
           <i class="bi bi-check-lg"></i>
           <span id="habit-toast-success__message"></span>

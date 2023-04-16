@@ -62,10 +62,10 @@ function createHabitRow(habitId, habitName) {
         ${habitName}
       </div>
       <div class="hover-habit">
-        <button type="button" class="btn btn-dark border" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-          <i class="bi bi-pencil-square" style="color: var(--color-background-dark-2);"></i>
+        <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+          <i class="bi bi-pencil-square icon-contrast"></i>
         </button>
-          <button type="submit" class="btn btn-dark border" data-role="delete-habit" data-habit="${habitId}">
+          <button type="submit" class="btn btn-light border" data-role="delete-habit" data-habit="${habitId}">
             <i class="bi bi-trash3" style="color: red;"></i>
           </button>
       </div>
@@ -280,7 +280,12 @@ const toggleTrackingOnClick = el => {
     })
     .then(() => {
       el.dataset.state = toggleState;
-      toggleTrackingOnClick(el);
+      el.classList.add('tracking-unit-animation');
+
+      el.addEventListener('animationend', () => {
+        el.classList.remove('tracking-unit-animation');
+        toggleTrackingOnClick(el);
+      });
     })
     .catch(response => {
       response.json().then(json_response => {
