@@ -10,6 +10,7 @@ urlpatterns = [
     path('delete_habit/<int:id>', views.delete_habit, name='delete_habit'),
     path('track_habit', views.track_habit, name='track_habit'),
     path('untrack_habit', views.untrack_habit, name='untrack_habit'),
+    path('store_theme', views.store_theme, name='store_theme'),
     
     path('login', views.login_view, name='login'),
     path('register', views.register, name='register'),

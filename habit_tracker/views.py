@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, HabitTracker, Habit, TrackedDate
 from .utils import is_username_an_email, get_week
 
+THEMES = ['default', 'purple', 'blue', 'pink', 'green', 'orange']
+
 def index(request, year=date.today().year, month=date.today().month):
     """
     View that renders main page containing a habit tracker.
@@ -47,11 +49,13 @@ def index(request, year=date.today().year, month=date.today().month):
         'month': month,
         'week': week,
         'active': habit_tracker.active if habit_tracker else True,
-        'habits': habits
+        'habits': habits,
+        'user_theme': request.session.get('theme', 'default'),
+        'themes': THEMES
     })
 
 @login_required
-@csrf_exempt
+@csrf_exempt # TODO Adiciona CSRF Token
 def track_habit(request):
     """
     Consiste em filtrar um hábito e relacioná-lo a um TrackedDate
@@ -85,7 +89,7 @@ def track_habit(request):
     return JsonResponse({'message': 'Method should be POST'}, status=405)
 
 @login_required
-@csrf_exempt
+@csrf_exempt # TODO Adiciona CSRF Token
 def untrack_habit(request):
     if request.method == 'POST':
         # TODO Validate form
@@ -179,8 +183,7 @@ def update_habit(request):
         return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
 
     return JsonResponse({'message': 'Habit updated'}, status=200)
-
-    
+   
 @login_required
 def delete_habit(request, id):
     if not request.method == 'POST':
@@ -195,6 +198,17 @@ def delete_habit(request, id):
 
     return JsonResponse({'message': f'Habit {habit.name} deleted'}, status=200)
 
+@login_required
+def store_theme(request):
+    if request.method != 'POST':
+        return JsonResponse({'message': 'Method should be POST'}, status=405)
+    
+    print('SETANDO A COR\n\n\n')
+    data = json.loads(request.body)['data']
+    request.session['theme'] = data['theme']
+    
+    return JsonResponse({"message": f"Theme changed to {data['theme']}"}, status=200)
+
 # --------------------------------------------------------- users app ------------------------------------------------------------------------------------------------------
 
 def register(request):
@@ -203,7 +217,8 @@ def register(request):
         confirmation = request.POST["confirmation"]
         if password != confirmation:
             return render(request, "habit_tracker/login.html", {
-                "message": "Passwords must match"
+                'message': 'Passwords must match',
+                'user_theme': request.session.get('theme', 'default')
             })
 
         try:
@@ -216,7 +231,8 @@ def register(request):
             user.save()
         except IntegrityError:
             return render(request, "habit_tracker/login.html", {
-                "message": "Username already taken"
+                'message': 'Username already taken',
+                'user_theme': request.session.get('theme', 'default')
             })
         
         login(request, user)
@@ -239,11 +255,14 @@ def login_view(request):
             return HttpResponseRedirect(reverse('index'))
         
         return render(request, 'habit_tracker/login.html', {
-            'message': 'Invalid credentials. Username/E-mail or password incorrect'
+            'message': 'Invalid credentials. Username/E-mail or password incorrect',
+            'user_theme': request.session.get('theme', 'default')
         }, status=401)
     
     if not request.user.is_authenticated:
-        return render(request, 'habit_tracker/login.html', status=200)
+        return render(request, 'habit_tracker/login.html', {
+            'user_theme': request.session.get('theme', 'default')
+        }, status=200)
 
     return HttpResponseRedirect(reverse('index'))
     

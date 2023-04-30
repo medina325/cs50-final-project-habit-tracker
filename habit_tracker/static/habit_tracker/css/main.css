@@ -2,37 +2,38 @@
     /* Os "--" se referem a criação de variáveis em CSS, que podem ser usadas com var(nome_variavel)*/
 
     --color-primary: #f6f6f6;
-    --color-secondary: #031a8b;
-    --body-bg: #0d102d;
+    --color-secondary: #8b3003;
+    --body-bg: #120801;
     --body-bg-contrast: white;
-    --nav-bg: #e7e6f7;
-    --btn-bg: #2e42a7;
+    --nav-bg: #ffd4b6;
+    --btn-bg: #dd6921;
     --btn-bg-contrast: white;
-    --btn-hover-bg: #14257b;
-    --btn-active-bg: #0e1a54;
-    --btn-focus-bg: #0e1a54;
-    --btn-disabled-bg: #3a3c5e;
-    --tracking-unit-border: #aebbff;
-    --tracking-unit-fill: #23e7f3;
+    --btn-hover-bg: #6e3313;
+    --btn-active-bg: #763717;
+    --btn-focus-bg: #763717;
+    --btn-disabled-bg: #514941;
+    --tracking-unit-border: #ffcdae;
+    --tracking-unit-fill: #df701b;
 }
 
-:root:has(#light:checked) {
-    --color-primary: #2c2c2c;
-    --color-secondary: #3e038b;
-    --body-bg: #ededed;
-    --body-bg-contrast: rgb(52, 52, 52);
-    --nav-bg: #383838;
-    --btn-bg: #602ea7;
-    --btn-bg-contrast: rgb(61, 61, 61);
-    --btn-hover-bg: #36147b;
-    --btn-active-bg: #240e54;
-    --btn-focus-bg: #240e54;
-    --btn-disabled-bg: #443a5e;
-    --tracking-unit-border: #ccaeff;
-    --tracking-unit-fill: #6823f3;
+:root:has(#default:checked), .default {
+    --color-primary: #f6f6f6;
+    --color-secondary: #8b3003;
+    --body-bg: #120801;
+    --body-bg-contrast: white;
+    --nav-bg: #ffd4b6;
+    --btn-bg: #dd6921;
+    --btn-bg-contrast: white;
+    --btn-hover-bg: #6e3313;
+    --btn-active-bg: #763717;
+    --btn-focus-bg: #763717;
+    --btn-disabled-bg: #514941;
+    --tracking-unit-border: #ffcdae;
+    --tracking-unit-fill: #df701b;
 }
 
 :root:has(#purple:checked), .purple {
+    --color-primary: #f6f6f6;
     --color-secondary: #7855ca;
     --body-bg: #1a0d2d;
     --body-bg-contrast: white;
@@ -64,6 +65,7 @@
 }
 
 :root:has(#pink:checked), .pink {
+    --color-primary: #f6f6f6;
     --color-secondary: #7d038b;
     --body-bg: #280d2d;
     --body-bg-contrast: white;
@@ -79,6 +81,7 @@
 }
 
 :root:has(#green:checked), .green {
+    --color-primary: #f6f6f6;
     --color-secondary: #20c807;
     --body-bg: #010e01;
     --body-bg-contrast: white;
@@ -94,6 +97,7 @@
 }
 
 :root:has(#orange:checked), .orange {
+    --color-primary: #f6f6f6;
     --color-secondary: #8b3003;
     --body-bg: #120801;
     --body-bg-contrast: white;
@@ -210,8 +214,8 @@ i, .icon {
     background-color: var(--radio-color);
 }
 
-.color-picker input[type="radio"]#light {
-    --radio-color: gray;
+.color-picker input[type="radio"]#default {
+    --radio-color: rgba(22, 22, 22, 0.986);
 }
 .color-picker input[type="radio"]#purple {
     --radio-color: #7855ca;
