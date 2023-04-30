@@ -31,7 +31,6 @@ function insertAfter(newElement, existingElement) {
   existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
 }
 
-
 const createTrackingUnits = (habit) => {
   const trackingDates = getTrackingDates();
   const currentMonth = getCurrentHabitTrackerMonth();
@@ -220,14 +219,14 @@ function updateHabit() {
     return Promise.reject(response);
   })
   .then(response => {
-    let habitEl = document.querySelector(`.habit-name[data-habit=${oldHabitName}]`);
+    let habitEl = document.querySelector(`.habit-name[data-habit="${oldHabitName}"]`);
     habitEl.dataset.habit = newHabitName;
     habitEl.innerText = newHabitName;
 
-    let editBtn = document.querySelector(`button[data-habit=${oldHabitName}`);
+    let editBtn = document.querySelector(`button[data-habit="${oldHabitName}"`);
     editBtn.dataset.habit = newHabitName;
 
-    let trackingUnits = document.querySelectorAll(`.tracking-unit[data-habit=${oldHabitName}]`);
+    let trackingUnits = document.querySelectorAll(`.tracking-unit[data-habit="${oldHabitName}"]`);
     trackingUnits.forEach(el => {
       el.dataset.habit = newHabitName;
       toggleTrackingOnClick(el);
