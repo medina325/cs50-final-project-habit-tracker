@@ -261,6 +261,9 @@ const toggleTrackingOnClick = el => {
   
     fetch(url, {
       method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken()
+      },
       mode: "same-origin",
       body: JSON.stringify({
         data: {
@@ -287,8 +290,8 @@ const toggleTrackingOnClick = el => {
       });
     })
     .catch(response => {
-      response.json().then(json_response => {
-        return json_response.error;
+      response.json().then(response => {
+        fillUpToastAndShow(response.message, 'fail');
       })
     });
   };
