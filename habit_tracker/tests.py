@@ -18,6 +18,22 @@ class HabitTrackerTestCase(TestCase):
                 year=first_habit_tracker.year
             )
 
+    def test_habit_tracker_check_month_min_values_constraint(self):
+        with self.assertRaisesRegex(IntegrityError, r'CHECK constraint failed: check_month_min_max_values'):
+            HabitTracker.objects.create(
+                user=self.user,
+                month=0,
+                year=2023
+            )
+    
+    def test_habit_tracker_check_month_max_values_constraint(self):     
+        with self.assertRaisesRegex(IntegrityError, r'CHECK constraint failed: check_month_min_max_values'):
+            HabitTracker.objects.create(
+                user=self.user,
+                month=13,
+                year=2023
+            )
+
     def test_validation_fails_when_habit_tracker_date_is_in_the_future(self):
         current_year = timezone.now().year
         form = HabitTrackerForm(data={'month': 1, 'year': current_year + 1})

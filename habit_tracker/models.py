@@ -66,7 +66,7 @@ class Habit(models.Model):
         MinValueValidator(1),
         MaxValueValidator(12)
     ])
-    year = models.PositiveIntegerField() # TODO Add a validation during save() to make sure the year is always the current year
+    year = models.PositiveIntegerField()
 
     creation_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
