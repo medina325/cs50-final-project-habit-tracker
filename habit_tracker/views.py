@@ -8,7 +8,9 @@ from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ValidationError
 
+from .forms import HabitTrackerForm, HabitForm, TrackedDateForm
 from .models import User, HabitTracker, Habit, TrackedDate
 from .utils import is_username_an_email, get_week
 
@@ -20,139 +22,139 @@ def index(request, year=date.today().year, month=date.today().month):
     
     Its URL may contain a year and a month, specifying which habit tracker
     to query from the database. In case there's no year or month specified,
-    a habit tracker for the current year and month will be returned.
+    a habit tracker for the current year and month will be created.
     """
     
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
     
-    week_number = request.GET.get('week', 1)
-    week = get_week(year, month, week_number)
+    form = HabitTrackerForm(data={'month': month, 'year': year})
+    
+    if not form.is_valid():
+        return HttpResponseRedirect(reverse("index"))
 
-    habit_tracker = (
-        request.user.habit_trackers
-        .filter(year=year, month=month)
-        .first()
+    habit_tracker, _ = HabitTracker.objects.get_or_create(
+        user=request.user,
+        month=month,
+        year=year
     )
     
     habits = [
         {
             'id': habit.id,
             'name': habit.name,
-            'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
+            'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()],
+            'habit_tracker_id': habit_tracker.id
         }
         for habit in habit_tracker.habits.all()
-    ] if habit_tracker else []
+    ]
+    
+    week_number = request.GET.get('week', 1)
+    week = get_week(year, month, week_number)
     
     return render(request, 'habit_tracker/index.html', {
         'year': year,
         'month': month,
         'week': week,
-        'active': habit_tracker.active if habit_tracker else True,
+        'active': habit_tracker.active,
         'habits': habits,
         'user_theme': request.session.get('theme', 'default'),
-        'themes': THEMES
+        'themes': THEMES,
     })
 
 @login_required
-@csrf_exempt # TODO Adiciona CSRF Token
-def track_habit(request):
-    """
-    Consiste em filtrar um hábito e relacioná-lo a um TrackedDate
-    """
-    
-    if request.method == 'POST':
-        # TODO Validate form
-        data = json.loads(request.body)['data']
+def create_tracked_date(request):
+    if request.method != 'POST':
+        return JsonResponse({'message': 'Method should be POST'}, status=405)
 
-        tracked_date = date.fromisoformat(data['date'])
-        if tracked_date.month != data['month']:
-            return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
+    data = json.loads(request.body)['data']
 
-        habit = (
-            request.user.habits
-            .filter(name=data['name'],
-                    year=data['year'],
-                    month=data['month'])
-            .first()
+    form = TrackedDateForm(data)
+    if not form.is_valid():
+        return JsonResponse({'message': form.errors['date'][0]}, status=400)
+
+    tracked_date = date.fromisoformat(data['date'])
+    if tracked_date.month != data['month'] or tracked_date.year != data['year']:
+        return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
+
+    try:
+        habit = Habit.objects.get(
+            user=request.user,
+            name=data['name'],
+            year=data['year'],
+            month=data['month']
         )
         
-        # TODO Check if there's already a tracked date for this date
-        # TODO Also add validation on the dataase
         tracked_date = TrackedDate(habit=habit,
-                                   date=date.fromisoformat(data['date']),
-                                   value='yes')
+                                    date=date.fromisoformat(data['date']),
+                                    value='yes')
         tracked_date.save()
+    except IntegrityError:
+        return JsonResponse({'message': 'Something went wrong, perhaps the habit was already tracked for this date?'}, status=404)
 
-        return JsonResponse({"message": f"Date {data['date']} tracked"}, status=201)
-    
-    return JsonResponse({'message': 'Method should be POST'}, status=405)
+    return JsonResponse({"message": f"Date {data['date']} tracked"}, status=201)
 
 @login_required
-@csrf_exempt # TODO Adiciona CSRF Token
-def untrack_habit(request):
-    if request.method == 'POST':
-        # TODO Validate form
-        data = json.loads(request.body)['data']
+def delete_tracked_date(request):
+    if request.method != 'POST':
+        return JsonResponse({'message': 'Method should be POST'}, status=405)
 
-        tracked_date = date.fromisoformat(data['date'])
-        if tracked_date.month != data['month']:
-            return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
+    data = json.loads(request.body)['data']
 
-        # TODO Find best way to validate if only one result is returned
-        habit = (
-            request.user.habits
-            .filter(name=data['name'],
-                    year=data['year'],
-                    month=data['month'])
-            .first()
+    form = TrackedDateForm(data)
+    if not form.is_valid():
+        return JsonResponse({'message': form.errors['date'][0]}, status=400)
+
+    tracked_date = date.fromisoformat(data['date'])
+    if tracked_date.month != data['month'] or tracked_date.year != data['year']:
+        return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
+
+    try:
+        habit = Habit.objects.get(
+            user=request.user,
+            name=data['name'],
+            year=data['year'],
+            month=data['month']
         )
 
-        # TODO Find best way to validate if only one result is returned
-        tracked_date = TrackedDate.objects.filter(
+        tracked_date = TrackedDate.objects.get(
             habit=habit,
             date=tracked_date
-        ).first()
+        )
         tracked_date.delete()
-
-        return JsonResponse({"message": f"Habit {habit.name} untracked for date {data['date']}"}, status=200)
+    except IntegrityError:
+        return JsonResponse({'message': 'Something went wrong, perhaps there is no habit tracked for this date?'}, status=404)
     
-    return JsonResponse({'message': 'Method should be POST'}, status=405)
+    return JsonResponse({"message": f"Habit {habit.name} untracked for date {data['date']}"}, status=200)
 
 @login_required
 def create_habit(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)['data']
+    if request.method != 'POST':
+        return JsonResponse({"message": "Method should be POST"}, status=405)
 
-        # TODO Validate form
-        
-        # TODO use get_or_create
-        habit_tracker_data = {
-            'user': request.user,
-            'month': data['month'],
-            'year': data['year']
-        }
-        
-        habit_tracker = HabitTracker.objects.filter(**habit_tracker_data).first()
+    data = json.loads(request.body)['data']
 
-        if not habit_tracker:
-            habit_tracker = HabitTracker(**habit_tracker_data)
-            habit_tracker.save()
-            
-        habit = Habit(user=request.user,
-                      habit_tracker=habit_tracker,
-                    #   **data)
-                      name=data['name'],
-                      month=data['month'],
-                      year=data['year'])
-        try:
-            habit.save()
-        except IntegrityError:
-            return JsonResponse({'message': f"Habit {data['name']} already exists"}, status=400)
-
-        return JsonResponse({'message': 'New habit added', 'data': {'id': habit.id}}, status=201)
+    form = HabitForm(data=data)
+    if not form.is_valid():
+        return JsonResponse({'message': 'Habit is not valid'}, status=400)
     
-    return JsonResponse({"message": "Method should be POST"}, status=405)
+    habit_tracker = HabitTracker.objects.get(
+        user=request.user,
+        month=data['month'],
+        year=data['year']
+    )
+    
+    habit = Habit(user=request.user,
+                  habit_tracker=habit_tracker,
+                  name=data['name'],
+                  month=data['month'],
+                  year=data['year'])
+    try:
+        habit.save()
+    except IntegrityError: # TODO Seria mais interessante utilizar um middleware para capturar esse tipo de erro
+        return JsonResponse({'message': f"Habit {data['name']} already exists"}, status=400)
+
+    return JsonResponse({'message': 'New habit added', 'data': {'id': habit.id}}, status=201)
 
 @login_required
 def update_habit(request):
@@ -160,7 +162,6 @@ def update_habit(request):
         return JsonResponse({"message": "Method should be POST"}, status=405)
     
     data = json.loads(request.body)['data']
-    # TODO Validate form
 
     habit_data = {
         'user': request.user,
@@ -177,7 +178,11 @@ def update_habit(request):
 
     # TODO Update tracking days
     try:
-        habit.name = data['new_name']
+        form = HabitForm(data={'name': data['new_name']})
+        if not form.is_valid():
+            return JsonResponse({'message': 'New name is not valid'}, status=400)
+            
+        habit.name = form.cleaned_data['name']
         habit.save()
     except IntegrityError:
         return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
@@ -189,7 +194,6 @@ def delete_habit(request, id):
     if not request.method == 'POST':
         return JsonResponse({'message': f'Method should be POST'}, status=405)
 
-    # habit = get_object_or_404(Habit, id=id)
     habit = Habit.objects.get(id=id)
     if not habit:
         return JsonResponse({'message': f'Habit not found'}, status=404)
@@ -203,7 +207,6 @@ def store_theme(request):
     if request.method != 'POST':
         return JsonResponse({'message': 'Method should be POST'}, status=405)
     
-    print('SETANDO A COR\n\n\n')
     data = json.loads(request.body)['data']
     request.session['theme'] = data['theme']
     
