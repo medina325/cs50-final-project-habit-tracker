@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
   <link rel="stylesheet" href="{% static 'habit_tracker/css/main.css' %}">
   <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/navbar.css' %}">
+  <link rel="icon" type="image/icon" href="{% get_static_prefix %}habit_tracker/favicon/favicon-{{ user_theme }}.ico">
+
   {% block css %}
   {% endblock %}
 
@@ -29,7 +31,7 @@
       <div class="top-bar-container">
         
         <a href="#">
-          <img class="logo" src="{% static 'habit_tracker/images/symfony.svg' %}" alt="Logo">
+          <img class="logo" src="{% get_static_prefix %}habit_tracker/favicon/favicon-{{ user_theme }}.ico" alt="Logo">
         </a>
         
         {% if user.is_authenticated %}

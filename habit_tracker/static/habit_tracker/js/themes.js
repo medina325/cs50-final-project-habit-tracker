@@ -30,6 +30,12 @@ const storeTheme = theme => {
 
 const applyTheme = (theme) => {
   document.querySelector('body').className = theme;
+  
+  let favicon = document.querySelector('link[rel=icon]');
+  favicon.href = favicon.href.replace(/-(\w+)\.ico/g, `-${theme}.ico`);
+
+  let logo = document.querySelector('img[class=logo]');
+  logo.src = logo.src.replace(/-(\w+)\.ico/g, `-${theme}.ico`);
 };
 
 document.addEventListener('DOMContentLoaded', function() {
