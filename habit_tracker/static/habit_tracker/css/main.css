@@ -1,35 +1,17 @@
-:root{
-    /* Os "--" se referem a criação de variáveis em CSS, que podem ser usadas com var(nome_variavel)*/
-
-    --color-primary: #f6f6f6;
-    --color-secondary: #8b3003;
-    --body-bg: #120801;
-    --body-bg-contrast: white;
-    --nav-bg: #ffd4b6;
-    --btn-bg: #dd6921;
-    --btn-bg-contrast: white;
-    --btn-hover-bg: #6e3313;
-    --btn-active-bg: #763717;
-    --btn-focus-bg: #763717;
-    --btn-disabled-bg: #514941;
-    --tracking-unit-border: #ffcdae;
-    --tracking-unit-fill: #df701b;
-}
-
-:root:has(#default:checked), .default {
-    --color-primary: #f6f6f6;
-    --color-secondary: #8b3003;
-    --body-bg: #120801;
-    --body-bg-contrast: white;
-    --nav-bg: #ffd4b6;
-    --btn-bg: #dd6921;
-    --btn-bg-contrast: white;
-    --btn-hover-bg: #6e3313;
-    --btn-active-bg: #763717;
-    --btn-focus-bg: #763717;
-    --btn-disabled-bg: #514941;
-    --tracking-unit-border: #ffcdae;
-    --tracking-unit-fill: #df701b;
+:root, :root:has(#default:checked), .default{
+    --color-primary: #413f45;
+    --color-secondary: #0c1524;
+    --body-bg: #fce9e9;
+    --body-bg-contrast: #d094f0;
+    --nav-bg: #cf88eeb3;
+    --btn-bg: #d094f0;
+    --btn-bg-contrast: #c488de;
+    --btn-hover-bg: #9c39d3;
+    --btn-active-bg: #8b32bd;
+    --btn-focus-bg: #8b32bd;
+    --btn-disabled-bg: #a99888;
+    --tracking-unit-border: #563e63;
+    --tracking-unit-fill: #d094f0;
 }
 
 :root:has(#purple:checked), .purple {
@@ -124,13 +106,6 @@ body {
     color: var(--color-primary);
 }
 
-main {
-    flex: 1;
- 
-    display: flex;
-    flex-direction: column;
-}
-
 i, .icon {
     fill: var(--color-primary);
     color: var(--color-primary);
@@ -142,7 +117,6 @@ i, .icon {
 }
 
 #layout-container {
-    width: 100vw;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
