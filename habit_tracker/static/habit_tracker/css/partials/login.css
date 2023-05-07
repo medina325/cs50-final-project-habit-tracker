@@ -1,11 +1,9 @@
-#login-flex-container {
-    flex: 1;
+main {
     display: flex;
-}
-
-/* For even columns */
-#login-flex-container > * {
-    flex-basis: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .login-nav {
