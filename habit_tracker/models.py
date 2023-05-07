@@ -62,11 +62,6 @@ class Habit(models.Model):
     habit_tracker = models.ForeignKey('HabitTracker', related_name='habits', on_delete=models.RESTRICT)
 
     name = models.TextField(validators=[no_empty_strings])
-    month = models.PositiveIntegerField(validators=[
-        MinValueValidator(1),
-        MaxValueValidator(12)
-    ])
-    year = models.PositiveIntegerField()
 
     creation_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

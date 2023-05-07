@@ -31,7 +31,7 @@ function insertAfter(newElement, existingElement) {
   existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
 }
 
-const createTrackingUnits = (habit) => {
+const createTrackingUnits = (habitId, habitName) => {
   const trackingDates = getTrackingDates();
   const currentMonth = getCurrentHabitTrackerMonth();
   let trackingUnits = '';
@@ -43,7 +43,7 @@ const createTrackingUnits = (habit) => {
     trackingUnits = `
         ${trackingUnits}
         <div class="tracking-unit-container">
-            <div class="tracking-unit rounded-circle ${disabledClass}" data-habit="${habit}" data-tracking-date="${isoDate}" data-state="notTracked"></div>
+            <div class="tracking-unit rounded-circle ${disabledClass}" data-habit="${habitName}" data-habit-id="${habitId}" data-tracking-date="${isoDate}" data-state="notTracked"></div>
         </div>
     `;
   });
@@ -61,7 +61,7 @@ function createHabitRow(habitId, habitName) {
         ${habitName}
       </div>
       <div class="hover-habit">
-        <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+        <button type="button" class="btn btn-light border" data-habit-id="${habitId}" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
           <i class="bi bi-pencil-square icon-contrast"></i>
         </button>
           <button type="submit" class="btn btn-light border" data-role="delete-habit" data-habit="${habitId}">
@@ -69,7 +69,7 @@ function createHabitRow(habitId, habitName) {
           </button>
       </div>
     </div>
-    ${createTrackingUnits(habitName)}
+    ${createTrackingUnits(habitId, habitName)}
   `;
 
   habitRow.querySelectorAll('.tracking-unit[data-tracking-date]')
@@ -164,6 +164,8 @@ const switchHabitTrackerMonthYear = el => {
 const readyUpdateHabitModal = el => {
   el.onclick = () => {
     const habitName = el.dataset.habit;
+    const habitId = el.dataset.habitId;
+    document.querySelector('input[name=habitId').value = habitId;
     document.querySelector('#input-update-habit-name').value = habitName;
     document.querySelector('input[name=oldHabitName]').value = habitName;
   }
@@ -195,6 +197,7 @@ function updateHabit() {
   
   const newHabitName = document.querySelector('#input-update-habit-name').value;
   const oldHabitName = document.querySelector('input[name=oldHabitName]').value;
+  const habitId = document.querySelector('input[name=habitId]').value;
   
   fetch('/update_habit', {
     method: 'POST',
@@ -204,11 +207,10 @@ function updateHabit() {
     mode: "same-origin",
     body: JSON.stringify({
       data: {
+        'habit_id': habitId,
         'old_name': oldHabitName,
         'new_name': newHabitName,
         'weekdays': trackingWeekdays,
-        'year': getCurrentHabitTrackerYear(),
-        'month': getCurrentHabitTrackerMonth()
       }
     })
   })
@@ -267,9 +269,8 @@ const toggleTrackingOnClick = el => {
       mode: "same-origin",
       body: JSON.stringify({
         data: {
+          'habit_id': el.dataset.habitId,
           'name': el.dataset.habit,
-          'year': getCurrentHabitTrackerYear(),
-          'month': getCurrentHabitTrackerMonth(),
           'date': el.dataset.trackingDate,
         }
       })  

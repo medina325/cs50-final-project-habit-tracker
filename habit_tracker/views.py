@@ -2,13 +2,11 @@ import json
 from datetime import date
 
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ValidationError
 
 from .forms import HabitTrackerForm, HabitForm, TrackedDateForm
 from .models import User, HabitTracker, Habit, TrackedDate
@@ -62,7 +60,7 @@ def index(request, year=date.today().year, month=date.today().month):
         'themes': THEMES,
     })
 
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def create_tracked_date(request):
     if request.method != 'POST':
         return JsonResponse({'message': 'Method should be POST'}, status=405)
@@ -73,28 +71,19 @@ def create_tracked_date(request):
     if not form.is_valid():
         return JsonResponse({'message': form.errors['date'][0]}, status=400)
 
-    tracked_date = date.fromisoformat(data['date'])
-    if tracked_date.month != data['month'] or tracked_date.year != data['year']:
-        return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
-
+    habit = Habit.objects.get(id=data.get('habit_id'))
+    
+    tracked_date = TrackedDate(habit=habit,
+                               date=date.fromisoformat(data['date']),
+                               value='yes')
     try:
-        habit = Habit.objects.get(
-            user=request.user,
-            name=data['name'],
-            year=data['year'],
-            month=data['month']
-        )
-        
-        tracked_date = TrackedDate(habit=habit,
-                                    date=date.fromisoformat(data['date']),
-                                    value='yes')
         tracked_date.save()
     except IntegrityError:
-        return JsonResponse({'message': 'Something went wrong, perhaps the habit was already tracked for this date?'}, status=404)
+        return JsonResponse({'message': 'Something went wrong, perhaps the habit was already tracked for this date?'}, status=400)
 
     return JsonResponse({"message": f"Date {data['date']} tracked"}, status=201)
 
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def delete_tracked_date(request):
     if request.method != 'POST':
         return JsonResponse({'message': 'Method should be POST'}, status=405)
@@ -105,21 +94,12 @@ def delete_tracked_date(request):
     if not form.is_valid():
         return JsonResponse({'message': form.errors['date'][0]}, status=400)
 
-    tracked_date = date.fromisoformat(data['date'])
-    if tracked_date.month != data['month'] or tracked_date.year != data['year']:
-        return JsonResponse({'message': 'date field\'s month should match month field'}, status=400)
-
     try:
-        habit = Habit.objects.get(
-            user=request.user,
-            name=data['name'],
-            year=data['year'],
-            month=data['month']
-        )
+        habit = Habit.objects.get(id=data.get('habit_id'))
 
         tracked_date = TrackedDate.objects.get(
             habit=habit,
-            date=tracked_date
+            date=date.fromisoformat(data['date'])
         )
         tracked_date.delete()
     except IntegrityError:
@@ -127,7 +107,7 @@ def delete_tracked_date(request):
     
     return JsonResponse({"message": f"Habit {habit.name} untracked for date {data['date']}"}, status=200)
 
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def create_habit(request):
     if request.method != 'POST':
         return JsonResponse({"message": "Method should be POST"}, status=405)
@@ -144,36 +124,27 @@ def create_habit(request):
         year=data['year']
     )
     
-    habit = Habit(user=request.user,
-                  habit_tracker=habit_tracker,
-                  name=data['name'],
-                  month=data['month'],
-                  year=data['year'])
     try:
-        habit.save()
+        habit = Habit.objects.create(
+            user=request.user,
+            habit_tracker=habit_tracker,
+            name=data['name']
+        )
     except IntegrityError: # TODO Seria mais interessante utilizar um middleware para capturar esse tipo de erro
         return JsonResponse({'message': f"Habit {data['name']} already exists"}, status=400)
 
     return JsonResponse({'message': 'New habit added', 'data': {'id': habit.id}}, status=201)
 
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def update_habit(request):
     if not request.method == 'POST':
         return JsonResponse({"message": "Method should be POST"}, status=405)
     
     data = json.loads(request.body)['data']
-
-    habit_data = {
-        'user': request.user,
-        'name': data['old_name'],
-        'month': data['month'],
-        'year': data['year']
-    }
     
-    # Get record and update it
-    habit = Habit.objects.filter(**habit_data).first()
-
-    if not habit:
+    try:
+        habit = Habit.objects.get(id=data['habit_id'])
+    except Habit.DoesNotExist:
         return JsonResponse({"message": "Habit not found"}, status=400)
 
     # TODO Update tracking days
@@ -184,25 +155,25 @@ def update_habit(request):
             
         habit.name = form.cleaned_data['name']
         habit.save()
+        return JsonResponse({'message': 'Habit updated'}, status=200)
     except IntegrityError:
         return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
 
-    return JsonResponse({'message': 'Habit updated'}, status=200)
-   
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def delete_habit(request, id):
     if not request.method == 'POST':
         return JsonResponse({'message': f'Method should be POST'}, status=405)
 
-    habit = Habit.objects.get(id=id)
-    if not habit:
-        return JsonResponse({'message': f'Habit not found'}, status=404)
+    try:
+        habit = Habit.objects.get(id=id)
+        habit.delete()
         
-    habit.delete()
+        return JsonResponse({'message': f'Habit {habit.name} deleted'}, status=200)
 
-    return JsonResponse({'message': f'Habit {habit.name} deleted'}, status=200)
+    except Habit.DoesNotExist:
+        return JsonResponse({'message': f'Habit not found'}, status=404)
 
-@login_required
+@login_required(login_url=reverse_lazy('login'))
 def store_theme(request):
     if request.method != 'POST':
         return JsonResponse({'message': 'Method should be POST'}, status=405)
@@ -268,7 +239,8 @@ def login_view(request):
         }, status=200)
 
     return HttpResponseRedirect(reverse('index'))
-    
+
+@login_required(login_url=reverse_lazy('login'))
 def logout_view(request):
     logout(request)
     

@@ -80,7 +80,7 @@
             {{ habit.name }}
           </div>
           <div class="hover-habit">
-            <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="{{ habit.name }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+            <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
               <i class="bi bi-pencil-square icon-contrast"></i>
             </button>
               <button type="button" class="btn btn-light border" data-role="delete-habit" data-habit="{{ habit.id }}">
@@ -90,7 +90,7 @@
         </div>
         {% for day in week %}
           <div class="tracking-unit-container">
-            <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
+            <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}"  data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
           </div>
         {% endfor %}
       </div>
@@ -99,7 +99,6 @@
     <div class="habit-tracker-row">
       <div id="add-new-habit-button">
         <button type="button" class="btn">
-          <!-- <i class="bi bi-calendar2-plus" style="font-size: 3rem;" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i> -->
           <i class="bi bi-calendar2-plus" data-bs-toggle="modal" data-bs-target="#newHabitModal"></i>
         </button>
       </div>
@@ -126,8 +125,7 @@
         <div class="modal-body">
           <form id="update-habit-form">
             {% csrf_token %}
-            <input type="hidden" value="{{ year }}" name="year">
-            <input type="hidden" value="{{ month }}" name="month">
+            <input type="hidden" value="" name="habitId">
             <input type="hidden" value="" name="oldHabitName">
             <div class="row">
               
