@@ -62,22 +62,6 @@
     border-radius: 10px;
 }
 
-/* .habits-tracker-grid-container {
-    flex-basis: 0;
-    flex-grow: 999;
-} */
-
-/* #check-stats-sidebar {
-    flex-basis: 10rem;
-    flex-grow: 1;
-    min-height: 100vh;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-} */
-
 #new-habit-button {
     cursor: pointer;
     width: 70px;
