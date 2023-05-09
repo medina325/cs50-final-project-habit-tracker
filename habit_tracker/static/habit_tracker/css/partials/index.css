@@ -54,7 +54,7 @@
     margin-top: 2rem;
     margin-inline: auto;
     align-items: center;
-
+    justify-content: center;
     gap: 0.5rem;
 }
 
@@ -64,6 +64,8 @@
 
 #container {
     margin: 0 auto;
+    max-width: 1400px;
+    padding: 1rem;
 }
 
 #new-habit-button {
@@ -75,10 +77,10 @@
 /* Habit tracker's grid */
 .habit-tracker-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr repeat(7, 1fr);
     text-align: center;
     vertical-align: middle;
-    margin-bottom: 10px;
+    padding: 1rem 0 1rem 0;
     animation-play-state: paused;
     animation-name: removerow;
     animation-duration: 1.0s;
@@ -87,11 +89,8 @@
 .habit-column {
     display: grid;
     grid-template-columns: 1fr;
-    margin: auto;
-    
     background-color: var(--btn-bg);
     padding-inline: 15px;
-    min-width: -webkit-fill-available;
     border-radius: 25px;
     font-size: 2rem;
 }
@@ -102,8 +101,11 @@
     transition: all 500ms ease;
 }
 
-
 .habit-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 3rem;
     grid-row-start: 1;
     grid-column-start: 1;
 }
@@ -213,6 +215,28 @@ button:has(i.bi-calendar2-plus):hover {
     border: 2px solid var(--color-secondary);
 }
 
-@media (width < 850px) {
-    /* TODO O que fazer????? */
+@media (width < 650px) {
+    @keyframes tracking {
+        0%, 100% {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        50% {
+            width: 1.7rem;
+            height: 1.7rem;
+        }
+    }
+    .habits-tracker-header {
+        font-size: 2.5rem;
+    }
+
+    .tracking-unit {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .habit-column {
+        font-size: 2rem;
+    }
 }
