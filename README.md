@@ -6,15 +6,15 @@
 - [Requirements](#requirements)
 - [How to Run](#how-to-run)
 
-## Introduction
+## Introduction 📖
 I started my journey with the CS50's Web course as a undergraduate student. It was the first course I took outside the university and made me learn a lot within a very short time. I managed to deliver every previous project within 6 months, from June to December, however after I landed my first internship in January (in many ways thanks to the knowledge I achieved with this course) and with the final semesters of my undergraduate course upon me, I struggled to finish the final project. Now, more than a year later, here I am with an idea I believe can finally make me finish this course with pride!
 
-The goal for this project, as the title says, is to create a Django website (oh really?) for tracking habits. The idea is to create an easy to use platform, high performant and mobile responsive, for people to be able to track their habits and ultimately be able to reach their goals.
+The goal for this project, as the title says, is to create a Django website (oh really?) for tracking habits. The idea is to create an easy to use platform, high performant and mobile responsive, for people to be able to track their habits and ultimately be able to reach their goals 🥇.
 
-## Distinctiveness and Complexity
+## Distinctiveness and Complexity 🧠
 This final project's distinctiveness and complexity, in comparasion to the previous ones, is defined by the following features:
 
-### Frontend organization
+### Frontend organization 🎨
 The frontend organization of the previous projects were not exactly
 ideal. There were many unnacessary files, with hard to cryptic usage
 of Jinja templating, CSS and JS. Not to mention no atention to
@@ -24,7 +24,7 @@ to revisit or contribute.
 So, in this regard, the idea for this final project is to be concise and
 organized with all frontend code.
 
-### Better layout decisions
+### Better layout decisions 🎨
 The layout for my implementation of the previous projects were
 non-existent. There were no ideas of responsive design, animations,
 box-model, whatsoever. The results are plain to see in each of the
@@ -33,7 +33,7 @@ box-model, whatsoever. The results are plain to see in each of the
 For this project, anything that looks ugly will be taken care of,
 that's a promise!
 
-### Backend organization
+### Backend organization 💻
 The backend code, similar to the frontend code, was very mess for
 all previous projects. The purpose of the views was not so intuitive,
 no idea of CRUDs as well, or form validation of any kind.
@@ -42,13 +42,13 @@ Now, the views in this project aims to be as clear as possible. With
 docstrings explaining some of its logic in case it's not 100%
 intuitive, and every use case properly covered.
 
-### Unit tests - TDD
+### Unit tests - TDD 🧪
 Speaking of use cases, TDD was used throughly in this project (actually not quite, 
 since many of the tests came after the development of the code). For every
 model constraint and use cases for the views, there are unit tests
 to make sure the views are behaving the way the should.
 
-### Docker to ease installation process
+### Docker to ease installation process 💙
 At the beginning of the project, a local sqlite database, as well
 as a venv Python virtual environment were being used for the development.
 
@@ -65,7 +65,7 @@ At the end of the day, the main idea for this project
 was to take a little something from every class of the course 
 (sunglasses here), since every class offers so much knowledge.
 
-## Requirements
+## Requirements 📓
 
 - Create a page with a habit tracker table for a specific month and year. In this page the user must be able to:
     - add habits
@@ -80,7 +80,7 @@ was to take a little something from every class of the course
 - Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end
 - Your web application must be mobile-responsive
 
-## How to Run
+## How to Run 🏃‍♂️
 
 The best way to install and run the application is by using Docker (with Docker Compose). Otherwise, a PostgreSQL database needs to be configured from scratch, as well as a Python virtual environment to install the dependencies of the project.
 
@@ -104,6 +104,6 @@ docker compose up -d --build
 
 > The Dockerfile created for the Django application, is not at all fit for a production environment, but it should suffice for testing and developing purposes.
 
-After the build process is over, head to http://localhost:8000 and see the application working >).
+After the build process is over, head to http://localhost:8000 and see the application working! 🔥
 
 ![google search](/examples/app.jpg)
