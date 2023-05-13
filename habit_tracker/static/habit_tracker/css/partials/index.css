@@ -1,20 +1,19 @@
 @keyframes removerow {
     0%, 50% {
         grid-template-rows: 1fr;
-        margin-bottom: 10px;
-    }
-
-    50%, 100% {
-        opacity: 0;
-    }
-
-    0% {
         opacity: 1;
+        padding: 1rem 0 1rem 0;
+    }
+
+    50% {
+        opacity: 0;
     }
 
     100% {
         grid-template-rows: 0;
-        margin-bottom: 0px;
+        padding: 0;
+        opacity: 0;
+
     }
 }
 
@@ -64,7 +63,8 @@
 
 #container {
     margin: 0 auto;
-    max-width: 1400px;
+    min-width: 50vw;
+    max-width: 75vw;
     padding: 1rem;
 }
 
@@ -130,7 +130,6 @@
 
 .habits-tracker-header {
     font-size: xxx-large;
-    margin-bottom: 20px;
 }
 
 [data-state="tracked"] {
