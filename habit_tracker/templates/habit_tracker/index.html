@@ -23,47 +23,47 @@
     Welcome back, {{ user.first_name }}!
   </div>
 
-  <div class="breadcrumbs-containers d-flex flex-row align-items-center gap-2 pl-2 pt-3">
-    <ol class="breadcrumb ms-3 mb-0">
-      <li class="breadcrumb-item">
-        <button type="button" class="btn p-0" data-bs-toggle="modal" data-bs-target="#calendarModal">
-          <i class="bi bi-calendar4-week" style="font-size: x-large;" data-bs-toggle="tooltip" data-bs-placement="auto" data-bs-title="Choose a year and a month for your calendar"></i>
-        </button>
-      </li>
-      <li class="breadcrumb-item">{{ year }}</li>
-      <li class="breadcrumb-item active" aria-current="page">{{ month | stringformat:"02d" }}</li>
-    </ol>
-  </div>
-
-  <div id="week-display">
-    <!-- Confuso? -->
-    {% if week.has_previous %}
-      <a href="?week={{ week.previous_page_number }}" class="week-scroller btn btn-action">
-    {% else %}
-      <a href="?week=1" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
-    {% endif %}
-        <i class="bi bi-arrow-left"></i>
-      </a>
-    <div id="week-range">
-      <div>
-        <span data-date="{{ week.0 | date:'Y-m-d' }}">{{ week.0 | date:"d/m"}}</span>
-        -
-        <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
-      </div>
-      <div style="text-align: center;">
-        
-      </div>
-    </div>
-    {% if week.has_next %}
-      <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-action">
-    {% else %}
-      <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
-    {% endif %}
-        <i class="bi bi-arrow-right"></i>
-      </a>
-  </div>
-
+  
   <div id="container">
+    <div class="breadcrumbs-containers d-flex flex-row align-items-center gap-2 pl-2 pt-3">
+      <ol class="breadcrumb ms-3 mb-0">
+        <li class="breadcrumb-item">
+          <button type="button" class="btn p-0" data-bs-toggle="modal" data-bs-target="#calendarModal">
+            <i class="bi bi-calendar4-week" style="font-size: x-large;" data-bs-toggle="tooltip" data-bs-placement="auto" data-bs-title="Choose a year and a month for your calendar"></i>
+          </button>
+        </li>
+        <li class="breadcrumb-item">{{ year }}</li>
+        <li class="breadcrumb-item active" aria-current="page">{{ month | stringformat:"02d" }}</li>
+      </ol>
+    </div>
+  
+    <div id="week-display">
+      <!-- Confuso? -->
+      {% if week.has_previous %}
+        <a href="?week={{ week.previous_page_number }}" class="week-scroller btn btn-action">
+      {% else %}
+        <a href="?week=1" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
+      {% endif %}
+          <i class="bi bi-arrow-left"></i>
+        </a>
+      <div id="week-range">
+        <div>
+          <span data-date="{{ week.0 | date:'Y-m-d' }}">{{ week.0 | date:"d/m"}}</span>
+          -
+          <span data-date="{{ week | last | date:'Y-m-d' }}">{{ week | last | date:"d/m"}}</span>
+        </div>
+        <div style="text-align: center;">
+          
+        </div>
+      </div>
+      {% if week.has_next %}
+        <a href="?week={{ week.next_page_number }}" class="week-scroller btn btn-action">
+      {% else %}
+        <a href="?week={{ week.paginator.num_pages }}" class="week-scroller btn btn-action disabled" tabindex="-1" aria-disabled="true">
+      {% endif %}
+          <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
 
     {% with 'M T W T F S S' as weekdays %}
       <div class="habit-tracker-row">
@@ -76,7 +76,7 @@
       
     {% for habit in habits %}
       <div class="habit-tracker-row" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}">
-        <div class="habit-column">
+        <div class="habit-column" data-toggle="tooltip" data-placement="top" title="{{ habit.name }}">
           <div class="habit-name" data-habit="{{ habit.name }}">
             {{ habit.name }}
           </div>

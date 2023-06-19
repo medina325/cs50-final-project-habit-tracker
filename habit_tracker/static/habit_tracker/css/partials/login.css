@@ -67,3 +67,7 @@ main {
 .backend-message {
     color: var(--color-secondary);
 }
+
+button[type=submit] {
+    font-weight: 600;
+}
