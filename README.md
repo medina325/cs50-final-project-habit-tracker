@@ -23,6 +23,12 @@ This final project's distinctiveness and complexity, in comparasion to the previ
 - Backend organization - DRY, SOLID, etc
 - Unit and integration tests - TDD
 - DevOps (possible to run with docker to ease the installation process)
+- Some files I created and their purpose:
+    - **static/habit_tracker/css/partials**: every file in this folder is imported in specific templates, e.g. index.css is only used on the index.html template;
+    - **static/habit_tracker/favicon**: folder that contains each icon for a specific theme;
+    - **static/habit_tracker/js**: folder that contains specific js files for each template (same idea as for the CSS files);
+    - **custom_validators.py**: file that contains custom validators used for certains model fields;
+    - **utils.py**: utility functions that can be used pretty much anywhere in the habit_tracker app;
 
 ## Requirements
 
