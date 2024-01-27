@@ -46,14 +46,6 @@ main {
     outline: none;
 }
 
-.active {
-    display: block;
-}
-
-.inactive {
-    display: none;
-}
-
 .login-sample-screenshot {
     background-color: var(--body-bg-contrast);
 }
