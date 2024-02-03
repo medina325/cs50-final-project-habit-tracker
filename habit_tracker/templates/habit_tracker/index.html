@@ -11,6 +11,8 @@
 
 {% block js %}
   <script src="{% static 'habit_tracker/js/index.js' %}"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -23,7 +25,6 @@
     Welcome back, {{ user.first_name }}!
   </div>
 
-  
   <div id="container">
     <div class="breadcrumbs-containers d-flex flex-row align-items-center gap-2 pl-2 pt-3">
       <ol class="breadcrumb ms-3 mb-0">
@@ -90,9 +91,7 @@
           </div>
         </div>
         {% for day in week %}
-          <div class="tracking-unit-container">
-            <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}"  data-tracking-date="{{ day | date:'c' }}" data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"></div>
-          </div>
+          {% include 'habit_tracker/tracking_unit.html' %}
         {% endfor %}
       </div>
     {% endfor %}

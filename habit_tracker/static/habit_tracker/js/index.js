@@ -339,10 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-  // Component 1 - Add tracking functionality for every "tracking unit"
-  document.querySelectorAll('.tracking-unit[data-tracking-date]')
-    .forEach(toggleTrackingOnClick);
-
   // Component 2 - Add new habit
   document.querySelector('#new-habit-submit-btn').onclick = createHabit;
 
@@ -358,4 +354,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Component 6 - Delete habit
   document.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
+
+  document.addEventListener('htmx:responseError', function(event) {
+      const error_message = event.detail.xhr.response;
+      
+      if (error_message) {
+          fillUpToastAndShow(error_message, 'fail');
+      }
+  });
 });
