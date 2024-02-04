@@ -31,55 +31,6 @@ function insertAfter(newElement, existingElement) {
   existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
 }
 
-const createTrackingUnits = (habitId, habitName) => {
-  const trackingDates = getTrackingDates();
-  const currentMonth = getCurrentHabitTrackerMonth();
-  let trackingUnits = '';
-
-  trackingDates.forEach(date => {
-    const disabledClass = currentMonth != date.getUTCMonth() + 1 ? 'disabled': '';
-    const isoDate = date.toISOString().slice(0, 10);
-
-    trackingUnits = `
-        ${trackingUnits}
-        <div class="tracking-unit-container">
-            <div class="tracking-unit rounded-circle ${disabledClass}" data-habit="${habitName}" data-habit-id="${habitId}" data-tracking-date="${isoDate}" data-state="notTracked"></div>
-        </div>
-    `;
-  });
-
-  return trackingUnits;
-};
-
-function createHabitRow(habitId, habitName) {
-  let habitRow = document.createElement('div');
-  habitRow.className = 'habit-tracker-row';
-  habitRow.dataset.habitId = habitId;
-  habitRow.innerHTML = `
-    <div class="habit-column">
-      <div class="habit-name" data-habit="${habitName}">
-        ${habitName}
-      </div>
-      <div class="hover-habit">
-        <button type="button" class="btn btn-light border" data-habit-id="${habitId}" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-          <i class="bi bi-pencil-square icon-contrast"></i>
-        </button>
-          <button type="submit" class="btn btn-light border" data-role="delete-habit" data-habit="${habitId}">
-            <i class="bi bi-trash3" style="color: red;"></i>
-          </button>
-      </div>
-    </div>
-    ${createTrackingUnits(habitId, habitName)}
-  `;
-
-  habitRow.querySelectorAll('.tracking-unit[data-tracking-date]')
-  .forEach(toggleTrackingOnClick);
-  habitRow.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
-  habitRow.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
-
-  return habitRow;
-}
-
 function hideAndCleanModalForm(modalId) {
   bootstrap.Modal.getInstance(modalId).hide();
   
@@ -87,56 +38,6 @@ function hideAndCleanModalForm(modalId) {
   document.querySelectorAll('.form-check-input').forEach((input) => {
     input.checked = false;
   });
-}
-
-function createHabit() {
-  let trackingWeekdays = {}
-  document.querySelectorAll('.form-check-input').forEach(radio => {
-    trackingWeekdays[radio.value] = radio.checked;
-  })
-
-  const habitName = document.querySelector('#input-habit-name').value
-  
-  fetch('/create_habit', {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCSRFToken()
-    },
-    mode: "same-origin",
-    body: JSON.stringify({
-      data: {
-        'name': habitName,
-        'weekdays': trackingWeekdays,
-        'year': getCurrentHabitTrackerYear(),
-        'month': getCurrentHabitTrackerMonth()
-      }
-    })
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    return Promise.reject(response);
-  })
-  .then(response => {
-    const newHabitRow = createHabitRow(response.data.id, habitName);
-
-    const habitTracker = document.querySelector('#container')
-
-    const habitRows = document.querySelectorAll('.habit-tracker-row');
-    const lastRow = habitRows[habitRows.length - 1];
-    habitTracker.insertBefore(newHabitRow, lastRow);
-
-    hideAndCleanModalForm('#newHabitModal');
-    fillUpToastAndShow(response.message, 'success');
-  })
-  .catch(response => {
-    response.json().then(response => {
-      fillUpToastAndShow(response.message, 'fail');
-    });
-  });
-    
-  return false;
 }
 
 const scrollYears = el => {
@@ -300,7 +201,7 @@ const toggleTrackingOnClick = el => {
 
 const deleteHabitWithUndoOption = el => {
   el.onclick = () => {
-    const habitId = el.dataset.habit;
+    const habitId = el.dataset.habitId;
     fetch(`/delete_habit/${habitId}`, {
       method: 'POST',
       headers: {
@@ -334,13 +235,27 @@ const deleteHabitWithUndoOption = el => {
   };
 };
 
+const isValidStatusCode = (status) => {
+  const regex = /^2\d{2}$/;
+  return regex.test(status.toString());
+};
+
+const isValidEvent = (event) => {
+  const responseHeader = event.detail.xhr.getResponseHeader('hx-trigger');
+  if (responseHeader === null) {
+    return false;
+  }
+
+  const validEvents = ['habitCreated']; // TODO Melhorar essa parte
+
+  const eventName = Object.keys(JSON.parse(responseHeader))[0];
+  return validEvents.includes(eventName);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // Initializing Tooltips
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-  // Component 2 - Add new habit
-  document.querySelector('#new-habit-submit-btn').onclick = createHabit;
 
   // Component 3 - Scroll through the years
   document.querySelectorAll('.year-scroller').forEach(scrollYears);
@@ -354,6 +269,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Component 6 - Delete habit
   document.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
+
+  document.addEventListener('htmx:afterRequest', function(event) {
+    if (!isValidStatusCode(event.detail.xhr.status) || !isValidEvent(event)) return;
+
+    const createdHabitName = event.detail.xhr.getResponseHeader('hx-habit-name');
+    const updateModalBtn = document.querySelector(
+      `[data-role="update-habit"][data-habit="${createdHabitName}"]`
+    );
+    readyUpdateHabitModal(updateModalBtn); // updateModalBtn.onclick = readyUpdateHabitModal;
+
+    const deleteModalBtn = document.querySelector(
+      `[data-role="delete-habit"][data-habit="${createdHabitName}"]`
+    );
+    deleteHabitWithUndoOption(deleteModalBtn); // deleteModalBtn.onclick = deleteHabitWithUndoOption;
+  });
+
+  document.addEventListener('habitCreated', function(event) {
+    hideAndCleanModalForm('#newHabitModal');
+    
+    const message = event.detail.value;
+    if (message) {
+      fillUpToastAndShow(message, 'success');
+    }
+  });
 
   document.addEventListener('htmx:responseError', function(event) {
       const error_message = event.detail.xhr.response;

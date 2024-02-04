@@ -80,7 +80,7 @@ def toggle_habit_tracking(request):
     habit = Habit.objects.get(id=data['habit_id'])
     tracked_date = datetime.fromisoformat(data['date']).date()
 
-    return render(request, "habit_tracker/tracking_unit.html", {
+    return render(request, "habit_tracker/components/tracking_unit.html", {
         'habit': {
             'id': data['habit_id'],
             'name': data['habit'],
@@ -93,13 +93,13 @@ def toggle_habit_tracking(request):
 @login_required(login_url=reverse_lazy('login'))
 def create_habit(request):
     if request.method != 'POST':
-        return JsonResponse({"message": "Method should be POST"}, status=405)
+        return HttpResponseRedirect(reverse("index"))
 
-    data = json.loads(request.body)['data']
+    data = json.loads(request.body)
 
-    form = HabitForm(data=data)
+    form = HabitForm(data)
     if not form.is_valid():
-        return JsonResponse({'message': 'Habit is not valid'}, status=400)
+        return HttpResponse(form.errors, status=400)
     
     habit_tracker = HabitTracker.objects.get(
         user=request.user,
@@ -114,9 +114,21 @@ def create_habit(request):
             name=data['name']
         )
     except IntegrityError: # TODO Seria mais interessante utilizar um middleware para capturar esse tipo de erro
-        return JsonResponse({'message': f"Habit {data['name']} already exists"}, status=400)
+        return HttpResponse(f"Habit {data['name']} already exists", status=400)
 
-    return JsonResponse({'message': 'New habit added', 'data': {'id': habit.id}}, status=201)
+    response = render(request, 'habit_tracker/components/habit_row.html', {
+        'habit': {
+            'id': habit.id,
+            'name': habit.name,
+            'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
+        },
+        'week': get_week(int(data['year']), int(data['month'])),
+        'month': int(data['month'])
+    }, status=201)
+
+    response['HX-Trigger'] = json.dumps({"habitCreated": "New habit added"})
+    response['HX-Habit-Name'] = habit.name
+    return response
 
 @login_required(login_url=reverse_lazy('login'))
 def update_habit(request):

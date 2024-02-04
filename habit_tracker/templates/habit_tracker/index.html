@@ -75,27 +75,12 @@
       </div>
     {% endwith %}
       
-    {% for habit in habits %}
-      <div class="habit-tracker-row" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}">
-        <div class="habit-column" data-toggle="tooltip" data-placement="top" title="{{ habit.name }}">
-          <div class="habit-name" data-habit="{{ habit.name }}">
-            {{ habit.name }}
-          </div>
-          <div class="hover-habit">
-            <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-              <i class="bi bi-pencil-square icon-contrast"></i>
-            </button>
-              <button type="button" class="btn btn-light border" data-role="delete-habit" data-habit="{{ habit.id }}">
-                <i class="bi bi-trash3 text-danger"></i>
-              </button>
-          </div>
-        </div>
-        {% for day in week %}
-          {% include 'habit_tracker/tracking_unit.html' %}
-        {% endfor %}
-      </div>
-    {% endfor %}
-
+    <div id="habit-row-container">
+      {% for habit in habits %}
+        {% include 'habit_tracker/components/habit_row.html' %}
+      {% endfor %}
+    </div>
+        
     <div class="habit-tracker-row">
       <div id="add-new-habit-button">
         <button type="button" class="btn">
@@ -108,223 +93,16 @@
         </div>
       {% endfor %}
     </div>
-    
   </div>
   
-
   <!-- Modals -->
-
-  <div class="modal fade" id="updateHabitModal" tabindex="-1" aria-labelledby="updateHabitModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="updateHabitModalLabel">Edit your habit</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        
-        <div class="modal-body">
-          <form id="update-habit-form">
-            {% csrf_token %}
-            <input type="hidden" value="" name="habitId">
-            <input type="hidden" value="" name="oldHabitName">
-            <div class="row">
-              
-              <div class="col">
-                <label for="input-update-habit-name" class="form-label">Habit name</label>
-                <input id="input-update-habit-name" type="text" class="form-control" aria-label="Habit name" required>
-              </div>
-              
-              <div class="col">
-                <div>Tracking Days</div>
-                <div class="row">
-
-                  {% with 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday' as weekdays %}
-                    {% for w in weekdays.split %}
-                      <div class="col">
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="checkbox" id="{{ w }}" value="{{ w }}">
-                          <label class="form-check-label" for="{{ w }}">{{ w|make_list|first }}</label>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  {% endwith %}
-
-                </div>
-              </div>
-
-            </div>
-          </form>
-        </div>
-
-        <div class="modal-footer">
-          <button id="update-habit-submit-btn" type="button" class="btn btn-action-contrast" autocomplete="off">Save habit</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="newHabitModal" tabindex="-1" aria-labelledby="newHabitModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="newHabitModalLabel">What is your new habit?</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        
-        <div class="modal-body">
-          <form id="new-habit-form">
-            {% csrf_token %}
-            <input type="hidden" value="{{ year }}" name="year">
-            <input type="hidden" value="{{ month }}" name="month">
-            <div class="row">
-              
-              <div class="col">
-                <label for="input-habit-name" class="form-label">Habit name</label>
-                <input id="input-habit-name" type="text" class="form-control" aria-label="Habit name" required>
-              </div>
-              
-              <div class="col">
-                <div>Tracking Days</div>
-                <div class="row">
-
-                  {% with 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday' as weekdays %}
-                    {% for w in weekdays.split %}
-                      <div class="col">
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="checkbox" id="{{ w }}" value="{{ w }}">
-                          <label class="form-check-label" for="{{ w }}">{{ w|make_list|first }}</label>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  {% endwith %}
-
-                </div>
-              </div>
-
-            </div>
-          </form>
-        </div>
-
-        <div class="modal-footer">
-          <button id="new-habit-submit-btn" type="button" class="btn btn-action-contrast" autocomplete="off">Create new habit</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content border">
-        <div class="modal-body">
-          <div id="year-container">
-            <button class="year-scroller btn btn-action" data-year-scroll="previous">
-              <i class="bi bi-arrow-left" style="font-size: 1rem; color: white;"></i>
-            </button>
-            <div id="habit-tracker-year">
-              {{ year }}
-            </div>
-            <button class="year-scroller btn btn-action" data-year-scroll="next">
-              <i class="bi bi-arrow-right" style="font-size: 1rem; color: white;"></i>
-            </button>
-          </div>
-          <div id="months-container">
-            <div class="row mb-3 gx-3">
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="1">Jan</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="2">Feb</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="3">Mar</button>
-              </div>
-            </div>
-            <div class="row mb-3 gx-3">
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="4">Apr</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="5">May</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="6">Jun</button>
-              </div>
-            </div>
-            <div class="row mb-3 gx-3">
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="7">Jul</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="8">Aug</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="9">Sep</button>
-              </div>
-            </div>
-            <div class="row mb-3 gx-3">
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="10">Oct</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="11">Nov</button>
-              </div>
-              <div class="col-4">
-                <button class="btn btn-action btn-month" data-month="12">Dec</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'habit_tracker/modals/new_habit_modal.html' %}
+  {% include 'habit_tracker/modals/update_habit_modal.html' %}
+  {% include 'habit_tracker/modals/calendar_modal.html' %}
 
   <!-- Toasts -->
-  <!-- Success Toast -->
-  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
-    <div id="habit-toast-success" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-body  rounded">
-        <div class="d-flex justify-content-center align-items-center gap-1">
-          <i class="bi bi-check-lg"></i>
-          <span id="habit-toast-success__message"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fail Toast -->
-  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
-    <div id="habit-toast-fail" class="toast hide text-white bg-dark w-100" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-body border border-2 border-danger rounded text-red">
-        <div class="d-flex justify-content-center align-items-center gap-1">
-          <i class="bi bi-x-lg"></i>
-          <span id="habit-toast-fail__message"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Undo delete Toast -->
-  <div class="toast-container position-absolute p-3 bottom-0 start-50 translate-middle-x" id="toastPlacement">
-    <div id="habit-toast-undo-delete" class="toast text-white bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-body border border-2 border-danger rounded text-red">
-
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="toast-body__message">
-            <i class="bi bi-trash3" style="color: red;"></i>
-            <span id="habit-toast-undo-delete__message">Habit deleted</span>
-          </div>
-          <div class="d-flex justify-content-end align-items-center gap-2">
-            <button class="btn btn-outline-light" data-role="undo-delete" type="button">Undo</button>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+  {% include 'habit_tracker/toasts/success_toast.html' %}
+  {% include 'habit_tracker/toasts/fail_toast.html' %}
+  {% include 'habit_tracker/toasts/undo_delete_toast.html' %}
 
 {% endblock %}
