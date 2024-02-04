@@ -1,0 +1,18 @@
+<div class="habit-tracker-row" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}">
+  <div class="habit-column" data-toggle="tooltip" data-placement="top" title="{{ habit.name }}">
+    <div class="habit-name" data-habit="{{ habit.name }}">
+      {{ habit.name }}
+    </div>
+    <div class="hover-habit">
+      <button type="button" class="btn btn-light border" data-role="update-habit" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
+        <i class="bi bi-pencil-square icon-contrast"></i>
+      </button>
+      <button type="button" class="btn btn-light border" data-role="delete-habit" data-habit="{{ habit.name }}" data-habit-id="{{ habit.id }}">
+        <i class="bi bi-trash3 text-danger"></i>
+      </button>
+    </div>
+  </div>
+  {% for day in week %}
+    {% include 'habit_tracker/components/tracking_unit.html' %}
+  {% endfor %}
+</div>
