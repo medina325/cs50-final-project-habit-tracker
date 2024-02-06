@@ -40,17 +40,11 @@ function hideAndCleanModalForm(modalId) {
   });
 }
 
-const scrollYears = el => {
-  el.onclick = () => {
-    let currentYearElement = document.querySelector('#habit-tracker-year');
-    const selectedYear = parseInt(currentYearElement.innerText);
-
-    if (el.dataset.yearScroll == 'next')
-      currentYearElement.innerHTML = selectedYear + 1;
-    else if (el.dataset.yearScroll == 'previous')
-      currentYearElement.innerHTML = selectedYear - 1;
-  }
-};
+const scrollYear = (value) => {
+  const currentYearElement = document.querySelector('#habit-tracker-year');
+  const selectedYear = parseInt(currentYearElement.innerText);
+  currentYearElement.innerHTML = selectedYear + value;
+}
 
 const switchHabitTrackerMonthYear = el => {
   el.onclick = () => {
@@ -253,12 +247,13 @@ const isValidEvent = (event) => {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Initializing Tooltips
+  // Initializing Bootstrap 5 Tooltips
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   // Component 3 - Scroll through the years
-  document.querySelectorAll('.year-scroller').forEach(scrollYears);
+  document.querySelector('[data-year-scroll="next"]').onclick = () => scrollYear(1);
+  document.querySelector('[data-year-scroll="previous"]').onclick = () => scrollYear(-1);
 
   // Component 4 - Pick a month/year for the habit tracker
   document.querySelectorAll('.btn-month').forEach(switchHabitTrackerMonthYear);
