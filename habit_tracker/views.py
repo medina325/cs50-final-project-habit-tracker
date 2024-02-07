@@ -133,26 +133,37 @@ def create_habit(request):
 @login_required(login_url=reverse_lazy('login'))
 def update_habit(request):
     if not request.method == 'POST':
-        return JsonResponse({"message": "Method should be POST"}, status=405)
+        return HttpResponseRedirect(reverse("index"))
     
-    data = json.loads(request.body)['data']
+    data = json.loads(request.body)
     
-    try:
-        habit = Habit.objects.get(id=data['habit_id'])
-    except Habit.DoesNotExist:
-        return JsonResponse({"message": "Habit not found"}, status=400)
-
     # TODO Update tracking days
     try:
+        habit = Habit.objects.get(id=data['habit_id_update'])
+
         form = HabitForm(data={'name': data['new_name']})
         if not form.is_valid():
-            return JsonResponse({'message': 'New name is not valid'}, status=400)
+            return HttpResponse(f"New name {data['name']} is not valid", status=400)
             
         habit.name = form.cleaned_data['name']
         habit.save()
-        return JsonResponse({'message': 'Habit updated'}, status=200)
+    except Habit.DoesNotExist:
+        return HttpResponse(f"Habit {data['name']} does not exist", status=404)
     except IntegrityError:
         return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
+
+    response = render(request, 'habit_tracker/components/habit_row.html', {
+        'habit': {
+            'id': habit.id,
+            'name': habit.name,
+            'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
+        },
+        'week': get_week(int(data['year']), int(data['month'])),
+        'month': int(data['month'])
+    }, status=201)
+
+    response['HX-Trigger'] = json.dumps({"habitUpdated": "Habit updated"})
+    return response
 
 @login_required(login_url=reverse_lazy('login'))
 def delete_habit(request, id):
