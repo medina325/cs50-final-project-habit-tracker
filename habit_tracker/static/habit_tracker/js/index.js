@@ -46,13 +46,13 @@ const scrollYear = (value) => {
   currentYearElement.innerHTML = selectedYear + value;
 }
 
-const switchHabitTrackerMonthYear = el => {
-  el.onclick = () => {
-    let currentYearElement = document.querySelector('#habit-tracker-year');
-    const year = currentYearElement.innerText;
-    const month = el.dataset.month;
-    const baseURL = window.location.origin;
-    window.location.href = new URL(`${baseURL}/${year}/${month}`);
+const switchHabitTrackerMonthYear = (event) => {
+  if (event.target && event.target.matches('.btn-month')) {
+      let currentYearElement = document.querySelector('#habit-tracker-year');
+      const year = currentYearElement.innerText;
+      const month = event.target.dataset.month;
+      const baseURL = window.location.origin;
+      window.location.href = new URL(`${baseURL}/${year}/${month}`);
   }
 };
 
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('[data-year-scroll="previous"]').onclick = () => scrollYear(-1);
 
   // Component 4 - Pick a month/year for the habit tracker
-  document.querySelectorAll('.btn-month').forEach(switchHabitTrackerMonthYear);
+  document.getElementById('months-container').addEventListener('click', switchHabitTrackerMonthYear);
 
   // Component 5 - Ready edit modal and actually edit habit
   document.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
