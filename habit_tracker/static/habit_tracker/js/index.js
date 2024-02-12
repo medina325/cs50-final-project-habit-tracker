@@ -1,25 +1,8 @@
-function getCurrentHabitTrackerYear() {
-  return parseInt(document.querySelector('[name=year]').value);
-}
-
-function getCurrentHabitTrackerMonth() {
-  return parseInt(document.querySelector('[name=month]').value);
-}
-
-function hideAndCleanModalForm(modalId) {
-  bootstrap.Modal.getInstance(modalId).hide();
-  
-  document.querySelector('#input-habit-name').value = '';
-  document.querySelectorAll('.form-check-input').forEach((input) => {
-    input.checked = false;
-  });
-}
-
 const scrollYear = (value) => {
   const currentYearElement = document.querySelector('#habit-tracker-year');
   const selectedYear = parseInt(currentYearElement.innerText);
   currentYearElement.innerHTML = selectedYear + value;
-}
+};
 
 const switchHabitTrackerMonthYear = (event) => {
   if (event.target && event.target.matches('.btn-month')) {
@@ -41,6 +24,23 @@ const readyUpdateHabitModal = el => {
     document.querySelector('input[name=old_name]').value = habitName;
   }
 };
+
+function getCurrentHabitTrackerYear() {
+  return parseInt(document.querySelector('[name=year]').value);
+}
+
+function getCurrentHabitTrackerMonth() {
+  return parseInt(document.querySelector('[name=month]').value);
+}
+
+function hideAndCleanModalForm(modalId) {
+  bootstrap.Modal.getInstance(modalId).hide();
+  
+  document.querySelector('#input-habit-name').value = '';
+  document.querySelectorAll('.form-check-input').forEach((input) => {
+    input.checked = false;
+  });
+}
 
 function createToast(toastEl, elOptions) {
   let options = elOptions || {
@@ -75,7 +75,7 @@ const isValidEvent = (event) => {
 
   const eventName = Object.keys(JSON.parse(responseHeader))[0];
   return validEvents.includes(eventName);
-}
+};
 
 const handleHabitEvent = (event, modalSelector) => {
   hideAndCleanModalForm(modalSelector);
@@ -84,7 +84,7 @@ const handleHabitEvent = (event, modalSelector) => {
   if (message) {
     fillUpToastAndShow(message, 'success');
   }
-}
+};
 
 document.addEventListener('DOMContentLoaded', function() {
   // Initializing Bootstrap 5 Tooltips
@@ -135,6 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const updateModalBtn = document.querySelector(
       `[data-role="update-habit"][data-habit="${createdHabitName}"]`
     );
-    readyUpdateHabitModal(updateModalBtn); // updateModalBtn.onclick = readyUpdateHabitModal;
+    readyUpdateHabitModal(updateModalBtn);
   });
 });
