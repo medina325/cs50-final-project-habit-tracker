@@ -60,42 +60,6 @@ const fillUpToastAndShow = (message, toastRole, options) => {
   toaster.show();
 };
 
-const deleteHabitWithUndoOption = el => {
-  el.onclick = () => {
-    const habitId = el.dataset.habitId;
-    fetch(`/delete_habit/${habitId}`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
-      },
-      mode: "same-origin"
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      return Promise.reject(response);
-    })
-    .then(response => {
-      const habitRow = document.querySelector(`.habit-tracker-row[data-habit-id="${habitId}"]`);
-      habitRow.style.animationPlayState = 'running';
-      habitRow.addEventListener('animationend', () => {
-        document.querySelector('#habit-toast-undo-delete__message').innerText = response.message;
-        const toastEl = document.querySelector('#habit-toast-undo-delete');
-        const toaster = new bootstrap.Toast(toastEl);
-        toaster.show();
-  
-        habitRow.remove();
-      });
-    })
-    .catch(response => {
-      response.json().then(response => {
-        fillUpToastAndShow(response.message, 'fail');
-      });
-    });
-  };
-};
-
 const isValidStatusCode = (status) => {
   const regex = /^2\d{2}$/;
   return regex.test(status.toString());
@@ -127,25 +91,33 @@ document.addEventListener('DOMContentLoaded', function() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-  // Component 3 - Scroll through the years
+  // Defining click handlers for scrolling through the years
   document.querySelector('[data-year-scroll="next"]').onclick = () => scrollYear(1);
   document.querySelector('[data-year-scroll="previous"]').onclick = () => scrollYear(-1);
 
-  // Component 4 - Pick a month/year for the habit tracker
+  // Defining handlers for picking the month and year for the habit tracker
   document.getElementById('months-container').addEventListener('click', switchHabitTrackerMonthYear);
 
-  // Component 5 - Ready edit modal and actually edit habit
+  // Ready edit modal
   document.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
 
-  // Component 6 - Delete habit
-  document.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
-
+  // Event listeners for HTMX responses
   document.addEventListener('habitCreated', (event) => {
     handleHabitEvent(event, '#newHabitModal');
   });
 
   document.addEventListener('habitUpdated', (event) => {
     handleHabitEvent(event, '#updateHabitModal');
+  });
+
+  document.addEventListener('habitDeleted', (event) => {
+    const habitName = event.detail.value;
+    const habitRow = document.querySelector(`.habit-tracker-row[data-habit="${habitName}"]`);
+    habitRow.style.animationPlayState = 'running';
+    habitRow.addEventListener('animationend', () => {
+      fillUpToastAndShow(`Habit ${habitName} deleted`, 'undo-delete');
+      habitRow.remove();
+    });
   });
 
   document.addEventListener('htmx:responseError', function(event) {
@@ -164,10 +136,5 @@ document.addEventListener('DOMContentLoaded', function() {
       `[data-role="update-habit"][data-habit="${createdHabitName}"]`
     );
     readyUpdateHabitModal(updateModalBtn); // updateModalBtn.onclick = readyUpdateHabitModal;
-
-    const deleteModalBtn = document.querySelector(
-      `[data-role="delete-habit"][data-habit="${createdHabitName}"]`
-    );
-    deleteHabitWithUndoOption(deleteModalBtn); // deleteModalBtn.onclick = deleteHabitWithUndoOption;
   });
 });

@@ -150,7 +150,7 @@ def update_habit(request):
     except Habit.DoesNotExist:
         return HttpResponse(f"Habit {data['name']} does not exist", status=404)
     except IntegrityError:
-        return JsonResponse({'message': f"Habit {data['new_name']} already exists"}, status=400)
+        return HttpResponse(f"Habit {data['new_name']} already exists", status=400)
 
     response = render(request, 'habit_tracker/components/habit_row.html', {
         'habit': {
@@ -174,10 +174,11 @@ def delete_habit(request, id):
         habit = Habit.objects.get(id=id)
         habit.delete()
         
-        return JsonResponse({'message': f'Habit {habit.name} deleted'}, status=200)
-
+        response = HttpResponse(f"Habit {habit.name} deleted", status=200)
+        response['HX-Trigger'] = json.dumps({"habitDeleted": habit.name})
+        return response
     except Habit.DoesNotExist:
-        return JsonResponse({'message': f'Habit not found'}, status=404)
+        return HttpResponse(f'Habit not found', status=404)
 
 @login_required(login_url=reverse_lazy('login'))
 def store_theme(request):
