@@ -1,0 +1,82 @@
+<div 
+  class="modal fade"
+  id="updateHabitModal"
+  tabindex="-1"
+  aria-labelledby="updateHabitModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="updateHabitModalLabel">Edit your habit</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form
+          id="update-habit-form"
+          hx-post="/update_habit"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          hx-target=""
+          hx-swap="outerHTML"
+          hx-ext='json-enc'
+        >
+          {% csrf_token %}
+          <input type="hidden" value="" name="habit_id_update">
+          <input type="hidden" value="" name="old_name">
+          <input type="hidden" value="{{ year }}" name="year">
+          <input type="hidden" value="{{ month }}" name="month">
+
+          <div class="row">  
+            <div class="col">
+              <label for="input-update-habit-name" class="form-label">Habit name</label>
+              <input
+                id="input-update-habit-name"
+                name="new_name"
+                type="text"
+                class="form-control"
+                aria-label="Habit name"
+                required
+              >
+            </div>
+            <div class="col">
+              <div>Tracking Days</div>
+              <div class="row">
+                {% with 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday' as weekdays %}
+                  {% for w in weekdays.split %}
+                    <div class="col">
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="{{ w }}">{{ w|make_list|first }}</label>
+                        <input
+                          id="{{ w }}"
+                          name="weekdays"
+                          value="{{ w }}"
+                          class="form-check-input"
+                          type="checkbox"
+                        >
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          id="update-habit-submit-btn"
+          type="submit"
+          form="update-habit-form"
+          class="btn btn-action-contrast"
+          autocomplete="off"
+        >
+          Save habit
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

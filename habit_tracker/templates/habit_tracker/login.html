@@ -9,22 +9,18 @@
   <link rel="stylesheet" href="{% static 'habit_tracker/css/partials/login.css' %}">
 {% endblock %}
 
-{% block js %}
-  <script src="{% static 'habit_tracker/js/login_form.js' %}"></script>
-{% endblock %}
-
 {% block body %}
   <main>
-    <div class="card text-center" style="max-width: 30rem;">
+    <div class="card text-center" style="max-width: 30rem;" x-data="{ activeForm: 'sign-in-form' }">
       <div class="login-nav py-3">
-        <a id="sign-in-toggle" href="#" data-toggle="sign-in-form" autofocus>Sign In</a>
+        <a id="sign-in-toggle" href="#" autofocus x-on:click.prevent="activeForm = 'sign-in-form'">Sign In</a>
         <div class="vr"></div>
-        <a id="register-toggle" href="#" data-toggle="register-form">Register</a>
+        <a id="register-toggle" href="#" x-on:click.prevent="activeForm = 'register-form'">Register</a>
       </div>
       <hr style="margin: 0;">
       <div class="card-body">
         <h6 class="backend-message">{{ message }}</h6>
-        <form action="{% url 'login' %}" method="POST" id="sign-in-form" class="active">
+        <form action="{% url 'login' %}" method="POST" id="sign-in-form" x-show="activeForm === 'sign-in-form'">
           {% csrf_token %}
           <div class="row mb-4">
             <div class="col input-group">
@@ -51,7 +47,7 @@
           </div>
         </form>
 
-        <form action="{% url 'register' %}" method="POST" id="register-form" class="inactive">
+        <form action="{% url 'register' %}" method="POST" id="register-form" x-show="activeForm === 'register-form'">
           {% csrf_token %}
           <div class="row mb-4">
             <div class="col-6">

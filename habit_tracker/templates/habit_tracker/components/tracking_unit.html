@@ -1,0 +1,25 @@
+<form
+  class="tracking-unit-container"
+  x-data="{ isActive: false }"
+  hx-post="/toggle_habit"
+  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  hx-trigger="click"
+  hx-swap="outerHTML"
+  hx-ext='json-enc'
+>
+  <input type="hidden" name="habit_id" value="{{ habit.id }}" />
+  <input type="hidden" name="habit" value="{{ habit.name }}" />
+  <input type="hidden" name="tracked_dates" value="{{ habit.tracked_dates }}" />
+  <input type="hidden" name="date" value="{{ day | date:'c' }}" />
+  <input type="hidden" name="state" value="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}" />
+
+  <div class="tracking-unit rounded-circle {% if day.month != month %}disabled{% endif %}"
+    x-bind:class="{ 'tracking-unit-animation': isActive }"
+    x-on:click="isActive = !isActive"
+    data-habit="{{ habit.name }}"
+    data-habit-id="{{ habit.id }}"
+    data-tracking-date="{{ day }}"
+    data-state="{% if day in habit.tracked_dates %}tracked{% else %}notTracked{% endif %}"
+  >
+  </div>
+</form>

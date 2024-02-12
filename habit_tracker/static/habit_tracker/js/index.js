@@ -1,4 +1,29 @@
-const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const scrollYear = (value) => {
+  const currentYearElement = document.querySelector('#habit-tracker-year');
+  const selectedYear = parseInt(currentYearElement.innerText);
+  currentYearElement.innerHTML = selectedYear + value;
+};
+
+const switchHabitTrackerMonthYear = (event) => {
+  if (event.target && event.target.matches('.btn-month')) {
+      let currentYearElement = document.querySelector('#habit-tracker-year');
+      const year = currentYearElement.innerText;
+      const month = event.target.dataset.month;
+      const baseURL = window.location.origin;
+      window.location.href = new URL(`${baseURL}/${year}/${month}`);
+  }
+};
+
+const readyUpdateHabitModal = el => {
+  el.onclick = () => {
+    const habitName = el.dataset.habit;
+    const habitId = el.dataset.habitId;
+    document.getElementById('update-habit-form').dataset.hxTarget = `[data-habit-id="${habitId}"]`;
+    document.querySelector('input[name=habit_id_update]').value = habitId;
+    document.querySelector('#input-update-habit-name').value = habitName;
+    document.querySelector('input[name=old_name]').value = habitName;
+  }
+};
 
 function getCurrentHabitTrackerYear() {
   return parseInt(document.querySelector('[name=year]').value);
@@ -6,78 +31,6 @@ function getCurrentHabitTrackerYear() {
 
 function getCurrentHabitTrackerMonth() {
   return parseInt(document.querySelector('[name=month]').value);
-}
-
-const getCSRFToken = () => {
-  return document.querySelector('input[name=csrfmiddlewaretoken]').value;
-}
-
-function getTrackingDates() {
-  const [start, end] = [
-    ...document.querySelectorAll('span[data-date]')
-  ].map(span => span.dataset.date);
-  
-  for (var arr=[], dt=new Date(start); dt <= new Date(end); dt.setDate(dt.getDate()+1))
-  {
-    arr.push(
-      new Date(dt)
-    );
-  }
-
-  return arr;
-};
-
-function insertAfter(newElement, existingElement) {
-  existingElement.parentNode.insertBefore(newElement, existingElement.nextSibling);
-}
-
-const createTrackingUnits = (habitId, habitName) => {
-  const trackingDates = getTrackingDates();
-  const currentMonth = getCurrentHabitTrackerMonth();
-  let trackingUnits = '';
-
-  trackingDates.forEach(date => {
-    const disabledClass = currentMonth != date.getUTCMonth() + 1 ? 'disabled': '';
-    const isoDate = date.toISOString().slice(0, 10);
-
-    trackingUnits = `
-        ${trackingUnits}
-        <div class="tracking-unit-container">
-            <div class="tracking-unit rounded-circle ${disabledClass}" data-habit="${habitName}" data-habit-id="${habitId}" data-tracking-date="${isoDate}" data-state="notTracked"></div>
-        </div>
-    `;
-  });
-
-  return trackingUnits;
-};
-
-function createHabitRow(habitId, habitName) {
-  let habitRow = document.createElement('div');
-  habitRow.className = 'habit-tracker-row';
-  habitRow.dataset.habitId = habitId;
-  habitRow.innerHTML = `
-    <div class="habit-column">
-      <div class="habit-name" data-habit="${habitName}">
-        ${habitName}
-      </div>
-      <div class="hover-habit">
-        <button type="button" class="btn btn-light border" data-habit-id="${habitId}" data-role="update-habit" data-habit="${habitName}" data-bs-toggle="modal" data-bs-target="#updateHabitModal">
-          <i class="bi bi-pencil-square icon-contrast"></i>
-        </button>
-          <button type="submit" class="btn btn-light border" data-role="delete-habit" data-habit="${habitId}">
-            <i class="bi bi-trash3" style="color: red;"></i>
-          </button>
-      </div>
-    </div>
-    ${createTrackingUnits(habitId, habitName)}
-  `;
-
-  habitRow.querySelectorAll('.tracking-unit[data-tracking-date]')
-  .forEach(toggleTrackingOnClick);
-  habitRow.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
-  habitRow.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
-
-  return habitRow;
 }
 
 function hideAndCleanModalForm(modalId) {
@@ -88,88 +41,6 @@ function hideAndCleanModalForm(modalId) {
     input.checked = false;
   });
 }
-
-function createHabit() {
-  let trackingWeekdays = {}
-  document.querySelectorAll('.form-check-input').forEach(radio => {
-    trackingWeekdays[radio.value] = radio.checked;
-  })
-
-  const habitName = document.querySelector('#input-habit-name').value
-  
-  fetch('/create_habit', {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCSRFToken()
-    },
-    mode: "same-origin",
-    body: JSON.stringify({
-      data: {
-        'name': habitName,
-        'weekdays': trackingWeekdays,
-        'year': getCurrentHabitTrackerYear(),
-        'month': getCurrentHabitTrackerMonth()
-      }
-    })
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    return Promise.reject(response);
-  })
-  .then(response => {
-    const newHabitRow = createHabitRow(response.data.id, habitName);
-
-    const habitTracker = document.querySelector('#container')
-
-    const habitRows = document.querySelectorAll('.habit-tracker-row');
-    const lastRow = habitRows[habitRows.length - 1];
-    habitTracker.insertBefore(newHabitRow, lastRow);
-
-    hideAndCleanModalForm('#newHabitModal');
-    fillUpToastAndShow(response.message, 'success');
-  })
-  .catch(response => {
-    response.json().then(response => {
-      fillUpToastAndShow(response.message, 'fail');
-    });
-  });
-    
-  return false;
-}
-
-const scrollYears = el => {
-  el.onclick = () => {
-    let currentYearElement = document.querySelector('#habit-tracker-year');
-    const selectedYear = parseInt(currentYearElement.innerText);
-
-    if (el.dataset.yearScroll == 'next')
-      currentYearElement.innerHTML = selectedYear + 1;
-    else if (el.dataset.yearScroll == 'previous')
-      currentYearElement.innerHTML = selectedYear - 1;
-  }
-};
-
-const switchHabitTrackerMonthYear = el => {
-  el.onclick = () => {
-    let currentYearElement = document.querySelector('#habit-tracker-year');
-    const year = currentYearElement.innerText;
-    const month = el.dataset.month;
-    const baseURL = window.location.origin;
-    window.location.href = new URL(`${baseURL}/${year}/${month}`);
-  }
-};
-
-const readyUpdateHabitModal = el => {
-  el.onclick = () => {
-    const habitName = el.dataset.habit;
-    const habitId = el.dataset.habitId;
-    document.querySelector('input[name=habitId').value = habitId;
-    document.querySelector('#input-update-habit-name').value = habitName;
-    document.querySelector('input[name=oldHabitName]').value = habitName;
-  }
-};
 
 function createToast(toastEl, elOptions) {
   let options = elOptions || {
@@ -189,173 +60,81 @@ const fillUpToastAndShow = (message, toastRole, options) => {
   toaster.show();
 };
 
-function updateHabit() {
-  let trackingWeekdays = {}
-  document.querySelectorAll('.form-check-input').forEach(radio => {
-    trackingWeekdays[radio.value] = radio.checked;
-  })
-  
-  const newHabitName = document.querySelector('#input-update-habit-name').value;
-  const oldHabitName = document.querySelector('input[name=oldHabitName]').value;
-  const habitId = document.querySelector('input[name=habitId]').value;
-  
-  fetch('/update_habit', {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCSRFToken()
-    },
-    mode: "same-origin",
-    body: JSON.stringify({
-      data: {
-        'habit_id': habitId,
-        'old_name': oldHabitName,
-        'new_name': newHabitName,
-        'weekdays': trackingWeekdays,
-      }
-    })
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    return Promise.reject(response);
-  })
-  .then(response => {
-    let habitEl = document.querySelector(`.habit-name[data-habit="${oldHabitName}"]`);
-    habitEl.dataset.habit = newHabitName;
-    habitEl.innerText = newHabitName;
-
-    let editBtn = document.querySelector(`button[data-habit="${oldHabitName}"`);
-    editBtn.dataset.habit = newHabitName;
-
-    let trackingUnits = document.querySelectorAll(`.tracking-unit[data-habit="${oldHabitName}"]`);
-    trackingUnits.forEach(el => {
-      el.dataset.habit = newHabitName;
-      toggleTrackingOnClick(el);
-    });
-
-    hideAndCleanModalForm('#updateHabitModal');
-    fillUpToastAndShow(response.message, 'success');
-  })
-  .catch(response => {
-    response.json().then(response => {
-      fillUpToastAndShow(response.message, 'fail');
-    });
-  });
-
-  return false;
+const isValidStatusCode = (status) => {
+  const regex = /^2\d{2}$/;
+  return regex.test(status.toString());
 };
 
-const toggleTrackingOnClick = el => {
-  el.onclick = () => {
-    const stateMap = {
-      tracked: {
-        url: '/untrack_habit',
-        toggleState: 'notTracked'
-      },
-      notTracked: {
-        url: '/track_habit',
-        toggleState: 'tracked'
-      }
-    };
-  
-    const {url, toggleState} = stateMap[el.dataset.state]
-  
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
-      },
-      mode: "same-origin",
-      body: JSON.stringify({
-        data: {
-          'habit_id': el.dataset.habitId,
-          'name': el.dataset.habit,
-          'date': el.dataset.trackingDate,
-        }
-      })  
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      return Promise.reject(response);
-    })
-    .then(() => {
-      el.dataset.state = toggleState;
-      el.classList.add('tracking-unit-animation');
+const isValidEvent = (event) => {
+  const responseHeader = event.detail.xhr.getResponseHeader('hx-trigger');
+  if (responseHeader === null) {
+    return false;
+  }
 
-      el.addEventListener('animationend', () => {
-        el.classList.remove('tracking-unit-animation');
-        toggleTrackingOnClick(el);
-      });
-    })
-    .catch(response => {
-      response.json().then(response => {
-        fillUpToastAndShow(response.message, 'fail');
-      })
-    });
-  };
+  const validEvents = ['habitCreated']; // TODO Melhorar essa parte
+
+  const eventName = Object.keys(JSON.parse(responseHeader))[0];
+  return validEvents.includes(eventName);
 };
 
-const deleteHabitWithUndoOption = el => {
-  el.onclick = () => {
-    const habitId = el.dataset.habit;
-    fetch(`/delete_habit/${habitId}`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
-      },
-      mode: "same-origin"
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      return Promise.reject(response);
-    })
-    .then(response => {
-      const habitRow = document.querySelector(`.habit-tracker-row[data-habit-id="${habitId}"]`);
-      habitRow.style.animationPlayState = 'running';
-      habitRow.addEventListener('animationend', () => {
-        document.querySelector('#habit-toast-undo-delete__message').innerText = response.message;
-        const toastEl = document.querySelector('#habit-toast-undo-delete');
-        const toaster = new bootstrap.Toast(toastEl);
-        toaster.show();
-  
-        habitRow.remove();
-      });
-    })
-    .catch(response => {
-      response.json().then(response => {
-        fillUpToastAndShow(response.message, 'fail');
-      });
-    });
-  };
+const handleHabitEvent = (event, modalSelector) => {
+  hideAndCleanModalForm(modalSelector);
+
+  const message = event.detail.value;
+  if (message) {
+    fillUpToastAndShow(message, 'success');
+  }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Initializing Tooltips
+  // Initializing Bootstrap 5 Tooltips
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-  // Component 1 - Add tracking functionality for every "tracking unit"
-  document.querySelectorAll('.tracking-unit[data-tracking-date]')
-    .forEach(toggleTrackingOnClick);
+  // Defining click handlers for scrolling through the years
+  document.querySelector('[data-year-scroll="next"]').onclick = () => scrollYear(1);
+  document.querySelector('[data-year-scroll="previous"]').onclick = () => scrollYear(-1);
 
-  // Component 2 - Add new habit
-  document.querySelector('#new-habit-submit-btn').onclick = createHabit;
+  // Defining handlers for picking the month and year for the habit tracker
+  document.getElementById('months-container').addEventListener('click', switchHabitTrackerMonthYear);
 
-  // Component 3 - Scroll through the years
-  document.querySelectorAll('.year-scroller').forEach(scrollYears);
-
-  // Component 4 - Pick a month/year for the habit tracker
-  document.querySelectorAll('.btn-month').forEach(switchHabitTrackerMonthYear);
-
-  // Component 5 - Ready edit modal and actually edit habit
+  // Ready edit modal
   document.querySelectorAll('[data-role="update-habit"]').forEach(readyUpdateHabitModal);
-  document.querySelector('#update-habit-submit-btn').onclick = updateHabit;
 
-  // Component 6 - Delete habit
-  document.querySelectorAll('button[data-role="delete-habit"]').forEach(deleteHabitWithUndoOption);
+  // Event listeners for HTMX responses
+  document.addEventListener('habitCreated', (event) => {
+    handleHabitEvent(event, '#newHabitModal');
+  });
+
+  document.addEventListener('habitUpdated', (event) => {
+    handleHabitEvent(event, '#updateHabitModal');
+  });
+
+  document.addEventListener('habitDeleted', (event) => {
+    const habitName = event.detail.value;
+    const habitRow = document.querySelector(`.habit-tracker-row[data-habit="${habitName}"]`);
+    habitRow.style.animationPlayState = 'running';
+    habitRow.addEventListener('animationend', () => {
+      fillUpToastAndShow(`Habit ${habitName} deleted`, 'undo-delete');
+      habitRow.remove();
+    });
+  });
+
+  document.addEventListener('htmx:responseError', function(event) {
+      const error_message = event.detail.xhr.response;
+      
+      if (error_message) {
+        fillUpToastAndShow(error_message, 'fail');
+      }
+  });
+
+  document.addEventListener('htmx:afterRequest', function(event) {
+    if (!isValidStatusCode(event.detail.xhr.status) || !isValidEvent(event)) return;
+
+    const createdHabitName = event.detail.xhr.getResponseHeader('hx-habit-name');
+    const updateModalBtn = document.querySelector(
+      `[data-role="update-habit"][data-habit="${createdHabitName}"]`
+    );
+    readyUpdateHabitModal(updateModalBtn);
+  });
 });
