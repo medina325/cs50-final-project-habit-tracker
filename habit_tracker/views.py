@@ -10,7 +10,12 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import HabitTrackerForm, HabitForm, TrackedDateForm
 from .models import User, HabitTracker, Habit
-from .utils import is_username_an_email, get_week, toggle_tracked_date
+from .utils import (
+    is_username_an_email,
+    get_week_dates,
+    toggle_tracked_date,
+    get_week_from_url
+)
 from .enums import HabitState
 
 THEMES = ['default', 'purple', 'blue', 'pink', 'green', 'orange']
@@ -49,7 +54,7 @@ def index(request, year=date.today().year, month=date.today().month):
     ]
     
     week_number = request.GET.get('week', 1)
-    week = get_week(year, month, week_number)
+    week = get_week_dates(year, month, week_number)
     
     return render(request, 'habit_tracker/index.html', {
         'year': year,
@@ -122,7 +127,11 @@ def create_habit(request):
             'name': habit.name,
             'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
         },
-        'week': get_week(int(data['year']), int(data['month'])),
+        'week': get_week_dates(
+            int(data['year']),
+            int(data['month']),
+            get_week_from_url(request.META['HTTP_REFERER'])
+        ),
         'month': int(data['month'])
     }, status=201)
 
@@ -158,7 +167,11 @@ def update_habit(request):
             'name': habit.name,
             'tracked_dates': [tracked_date.date for tracked_date in habit.tracked_dates.all()]
         },
-        'week': get_week(int(data['year']), int(data['month'])),
+        'week': get_week_dates(
+            int(data['year']),
+            int(data['month']),
+            get_week_from_url(request.META['HTTP_REFERER'])
+        ),
         'month': int(data['month'])
     }, status=201)
 
