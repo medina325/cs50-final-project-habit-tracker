@@ -1,3 +1,7 @@
+const getCSRFToken = () => {
+  return document.querySelector('input[name=csrfmiddlewaretoken]').value;
+}
+
 const storeTheme = async (theme) => {
   try {
     const response = await fetch('/store_theme', {
